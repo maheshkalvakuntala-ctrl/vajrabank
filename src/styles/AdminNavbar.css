@@ -1,0 +1,118 @@
+.admin-navbar {
+    height: 64px;
+    background: rgb(25, 34, 63);
+    border-bottom: 1px solid #e5e7eb;
+    display: flex;
+    align-items: center;
+    justify-content: flex-end;
+    padding: 0 32px;
+    position: sticky;
+    top: 0;
+    z-index: 50;
+    width: 100%;
+}
+
+.admin-profile-menu {
+    position: relative;
+}
+
+.admin-nav-link{
+    color: white;
+    text-decoration: none;
+    font-weight: 500;
+    font-size: 14px;
+    margin-right: 200px;
+
+}
+
+.admin-nav-link:hover {
+    color: #3b82f6;
+}
+.profile-trigger {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    cursor: pointer;
+    padding: 4px 8px;
+    border-radius: 8px;
+    transition: background 0.2s;
+    background: none;
+    border: none;
+}
+
+.profile-trigger:hover {
+    background: #f3f4f6;
+}
+
+.profile-avatar {
+    width: 36px;
+    height: 36px;
+    background: #3b82f6;
+    color: white;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-weight: 600;
+    font-size: 14px;
+}
+
+.profile-dropdown {
+    position: absolute;
+    top: 120%;
+    right: 0;
+    width: 200px;
+    background: white;
+    border: 1px solid #e5e7eb;
+    border-radius: 12px;
+    box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06);
+    padding: 8px;
+    animation: fadeDown 0.2s ease;
+}
+
+.dropdown-user-info {
+    padding: 8px 12px;
+    border-bottom: 1px solid #e5e7eb;
+    margin-bottom: 8px;
+}
+
+.dropdown-user-info strong {
+    display: block;
+    font-size: 14px;
+    color: #111827;
+}
+
+.dropdown-user-info span {
+    display: block;
+    font-size: 12px;
+    color: #6b7280;
+}
+
+.logout-btn {
+    width: 100%;
+    text-align: left;
+    padding: 8px 12px;
+    background: none;
+    border: none;
+    color: #ef4444;
+    font-size: 14px;
+    border-radius: 6px;
+    cursor: pointer;
+    transition: background 0.2s;
+}
+
+.logout-btn:hover {
+    background: #fef2f2;
+}
+
+@keyframes fadeDown {
+    from {
+        opacity: 0;
+        transform: translateY(-8px);
+    }
+
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}

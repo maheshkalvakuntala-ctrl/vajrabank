@@ -1,0 +1,38 @@
+/* ================= ADMIN ONLY ================= */
+
+.admin-layout {
+  display: flex;
+  min-height: 100vh;
+  background: #f8fafc;
+}
+
+/* SIDEBAR */
+.admin-sidebar {
+  width: 260px;
+  background: #0b1220;
+  color: white;
+
+  display: flex;
+  flex-direction: column;
+}
+
+/* MENU SCROLL */
+.admin-sidebar-menu {
+  flex: 1;
+  overflow-y: auto;
+}
+
+/* REMOVE BLACK SPACE BELOW LOGOUT */
+.admin-sidebar-user {
+  background: #0b1220;
+  border-top: 1px solid #1e293b;
+}
+
+/* MAIN CONTENT */
+.admin-content {
+  flex: 1;
+  padding: 32px;
+  overflow: visible;
+  background: #f8fafc;
+}
+

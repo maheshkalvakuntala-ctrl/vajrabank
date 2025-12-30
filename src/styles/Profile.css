@@ -1,0 +1,159 @@
+.profile-page {
+  animation: fadeIn 0.5s ease;
+}
+
+/* HEADER */
+.profile-header {
+  margin-bottom: 24px;
+  color: black;
+}
+
+.profile-header h2 {
+  margin-bottom: 4px;
+}
+
+.profile-header p {
+  color: #6b7280;
+}
+
+/* GRID */
+.profile-grid {
+  display: grid;
+  margin-top: 20px;
+  grid-template-columns: repeat(2, 1fr);
+  gap: 24px;
+}
+
+/* CARD */
+.profile-card {
+  background: #f8f3f3;
+  border-radius: 16px;
+  box-shadow: 0 10px 30px rgba(0, 0, 0, 0.08);
+  overflow: hidden;
+  transition: transform 0.3s ease;
+}
+
+.profile-card:hover {
+  transform: translateY(-5px);
+}
+
+/* CARD HEADER */
+.card-head {
+  background: linear-gradient(135deg, #1e3a5f, #2b5a8a);
+  color: #fff;
+  padding: 16px 20px;
+  font-weight: 600;
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+
+/* INFO ITEM */
+.info-item {
+  display: flex;
+  color: black;
+  align-items: center;
+  gap: 14px;
+  padding: 16px 20px;
+  border-bottom: 1px solid #e5e7eb;
+}
+
+.info-item span {
+  font-size: 13px;
+  color: #6b7280;
+}
+
+.info-item strong {
+  display: block;
+  margin-top: 2px;
+}
+
+/* SPLIT ROW */
+.info-row-split {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+}
+
+/* STATUS */
+.status.active {
+  background: #bbf7d0;
+  color: #166534;
+  padding: 4px 10px;
+  border-radius: 999px;
+  font-size: 12px;
+  margin-left: 8px;
+}
+
+/* ANIMATION */
+@keyframes fadeIn {
+  from {
+    opacity: 0;
+    transform: translateY(8px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+/* RESPONSIVE */
+@media (max-width: 900px) {
+  .profile-grid {
+    grid-template-columns: 1fr;
+  }
+}
+
+/* ===== CURRENT BALANCE CARD ===== */
+.balance-card {
+  background: #dfc2ee;
+  border-radius: 18px;
+  margin-top: 32px;
+  padding: 40px;
+  text-align: center;
+  box-shadow: 0 14px 40px rgba(239, 175, 175, 0.08);
+  animation: fadeUp 0.5s ease;
+}
+
+.balance-title {
+  color: #64748b;
+  font-size: 16px;
+  margin-bottom: 10px;
+}
+
+.balance-amount {
+  font-size: 48px;
+  font-weight: 700;
+  color: #1e3a5f;
+  margin-bottom: 8px;
+}
+
+.balance-date {
+  color: #64748b;
+  font-size: 14px;
+}
+
+
+/* ===== SECURITY NOTICE ===== */
+.security-notice {
+  margin-top: 28px;
+  padding: 18px 22px;
+  background: #dfc2ee;
+  border-left: 6px solid #1e3a5f;
+  border-radius: 12px;
+  color: #334155;
+  font-size: 14px;
+  animation: fadeUp 0.6s ease;
+}
+
+/* ===== ANIMATION ===== */
+@keyframes fadeUp {
+  from {
+    opacity: 0;
+    transform: translateX(8px);
+  }
+  to {
+    opacity: 1;
+    transform: translateX(0);
+  }
+}
+

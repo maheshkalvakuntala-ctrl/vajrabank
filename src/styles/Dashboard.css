@@ -1,0 +1,201 @@
+/* PAGE */
+.dashboard-page {
+  animation: fadeUp 0.6s ease;
+  color: #131e30;
+}
+
+/* ===== STATS ===== */
+
+.stats-grid {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 24px;
+}
+
+.stat-card {
+  background: #ffffff;
+  border-radius: 16px;
+  padding: 22px;
+  box-shadow: 0 12px 30px rgba(0, 0, 0, 0.08);
+  transition: all 0.3s ease;
+}
+
+.stat-card:hover {
+  transform: translateY(-6px);
+  background: white;
+}
+
+.stat-card.primary {
+  background-color: white;
+  color: #130d0d;
+}
+
+
+.stat-card p {
+  margin: 0;
+  font-size: 14px;
+  opacity: 0.9;
+}
+
+.stat-card h3,
+.stat-card h2 {
+  margin: 8px 0;
+  font-size: 26px;
+}
+
+.stat-card h4 {
+  margin: 0;
+  font-size: 16px;
+  color: #4b5563;
+  font-weight: 600;
+}
+
+/* ===== QUICK ACTIONS ===== */
+.quick-actions {
+  background: #ffffff;
+  margin-top: 26px;
+  border-radius: 16px;
+  padding: 22px;
+  box-shadow: 0 12px 30px rgba(0, 0, 0, 0.08);
+  margin-bottom: 15px;
+}
+
+.actions {
+  display: flex;
+  gap: 16px;
+  flex-wrap: wrap;
+}
+
+.actions .btn {
+  border-radius: 999px;
+  padding: 10px 18px;
+  font-weight: 500;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+/* ===== BOTTOM CARDS ===== */
+.info-card {
+  border-radius: 16px;
+  overflow: hidden;
+  background: #ffffff;
+  box-shadow: 0 12px 30px rgba(0, 0, 0, 0.08);
+  transition: transform 0.3s ease;
+}
+
+.info-card:hover {
+  transform: translateX(-4px);
+
+}
+
+.info-card .card-header {
+  background: linear-gradient(135deg, #394b63, #01070e);
+  color: #ffffff;
+  padding: 14px 18px;
+  font-weight: 600;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+/* TRANSACTIONS */
+.transaction-item {
+  display: flex;
+  justify-content: space-between;
+  color: rgb(30, 23, 23);
+  padding: 16px 18px;
+  border-bottom: 1px solid #e5e7eb;
+}
+
+.transaction-item:last-child {
+  border-bottom: none;
+}
+
+.transaction-item small {
+  display: block;
+  color: #17191e;
+}
+
+.credit {
+  color: #0e0f0e;
+  font-weight: 600;
+}
+
+.debit {
+  color: #1c1b1b;
+  font-weight: 600;
+}
+
+/* ACCOUNT INFO */
+.info-row {
+  display: flex;
+  justify-content: space-between;
+  padding: 16px 18px;
+  border-bottom: 1px solid #e5e7eb;
+}
+
+.info-row:last-child {
+  border-bottom: none;
+}
+
+/* ===== ANIMATION ===== */
+@keyframes fadeUp {
+  from {
+    opacity: 0;
+    transform: translateY(10px);
+  }
+
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+/* ===== RESPONSIVE ===== */
+@media (max-width: 992px) {
+  .stats-grid {
+    grid-template-columns: 1fr;
+  }
+}
+
+/* Risk Badges */
+.risk-badge {
+  border: 1px solid rgba(0, 0, 0, 0.1);
+}
+
+.text-danger {
+  color: #ef4444;
+}
+
+.text-warning {
+  color: #f59e0b;
+}
+
+.text-success {
+  color: #22c55e;
+}
+
+.text-primary {
+  color: #3b82f6;
+}
+
+/* DANGER Card Style */
+.stat-card.danger {
+  border-left: 4px solid #ef4444;
+}
+
+.stat-card.warning {
+  border-left: 4px solid #f59e0b;
+}
+
+.stat-card.primary {
+  border-left: 4px solid #3b82f6;
+}
+
+/* Filter Inputs */
+.filters-bar input:focus,
+.filters-bar select:focus {
+  outline: 2px solid #3b82f6;
+  border-color: #3b82f6;
+}
