@@ -1,0 +1,182 @@
+:root{
+  --bg: #f6f7f9;
+  --card: #ffffff;
+  --muted: #9ca3af;
+  --text: #0b1220;
+  --primary: #3b82f6; /* fintech blue */
+  --navy: #0f2946;
+  --soft-shadow: 0 8px 28px rgba(15, 20, 34, 0.06);
+}
+
+.profile-page {
+  padding: 24px;
+  background: var(--bg);
+  min-height: 100vh;
+  color: var(--text);
+  width: 100%;
+  box-sizing: border-box;
+}
+
+.page-title {
+  margin-bottom: 18px;
+  font-size: 28px;
+  font-weight: 700;
+  color: var(--navy);
+}
+
+/* ===== HEADER ===== */
+.profile-header {
+  background: var(--card);
+  border-radius: 14px;
+  padding: 22px;
+  margin-bottom: 20px;
+  box-shadow: var(--soft-shadow);
+}
+
+.profile-user {
+  display: flex;
+  gap: 18px;
+  align-items: center;
+}
+
+.avatar {
+  width: 84px;
+  height: 84px;
+  border-radius: 50%;
+  background: linear-gradient(135deg, rgba(59,130,246,1) 0%, rgba(99,102,241,1) 100%);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 34px;
+  color: #fff;
+  font-weight: 700;
+  box-shadow: 0 6px 18px rgba(59,130,246,0.12);
+}
+
+.profile-user h3 {
+  margin: 0 0 6px 0;
+  font-size: 20px;
+  color: var(--navy);
+}
+
+.role {
+  color: var(--muted);
+  font-size: 13px;
+  margin: 0;
+  font-weight: 600;
+}
+
+.location {
+  font-size: 13px;
+  color: var(--muted);
+  margin: 4px 0 0 0;
+}
+
+/* ===== CARD ===== */
+.profile-card {
+  background: var(--card);
+  border-radius: 14px;
+  padding: 20px;
+  margin-bottom: 20px;
+  box-shadow: var(--soft-shadow);
+}
+
+.card-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 18px;
+}
+
+.card-header h3 { margin:0; font-size:16px; color:var(--navy); }
+
+.card-header button {
+  background: linear-gradient(180deg,var(--primary), #2563eb);
+  border: none;
+  color: white;
+  padding: 8px 14px;
+  border-radius: 10px;
+  cursor: pointer;
+  font-weight: 600;
+  box-shadow: 0 6px 18px rgba(37,99,235,0.12);
+  transition: transform 120ms ease, box-shadow 120ms ease, opacity 120ms ease;
+}
+
+.card-header button:hover { transform: translateY(-2px); box-shadow: 0 10px 24px rgba(37,99,235,0.14); }
+
+/* ===== GRID ===== */
+.info-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+  gap: 18px 24px;
+}
+
+.info-item {
+  background: transparent;
+  padding: 8px 12px;
+  border-radius: 8px;
+}
+
+.info-item span {
+  font-size: 13px;
+  color: var(--muted);
+  display:block;
+}
+
+.info-item strong {
+  display: block;
+  margin-top: 8px;
+  font-size: 15px;
+  color: var(--navy);
+  font-weight: 700;
+}
+
+/* ===== EDIT PANEL ===== */
+.edit-panel {
+  background: var(--card);
+  border-radius: 12px;
+  padding: 18px;
+  box-shadow: var(--soft-shadow);
+}
+
+.edit-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+  gap: 14px;
+  margin-bottom: 18px;
+}
+
+.edit-grid input {
+  padding: 10px;
+  border-radius: 8px;
+  border: 1px solid #e6e9ef;
+  background: #fff;
+}
+
+.edit-actions {
+  display: flex;
+  gap: 12px;
+}
+
+.edit-actions .save {
+  background: var(--primary);
+  border: none;
+  color: white;
+  padding: 8px 16px;
+  border-radius: 8px;
+}
+
+.edit-actions .cancel {
+  background: transparent;
+  border: 1px solid #e6e9ef;
+  color: var(--navy);
+  padding: 8px 16px;
+  border-radius: 8px;
+}
+
+/* Small responsive tweaks */
+@media (max-width: 720px) {
+  .avatar { width:64px; height:64px; font-size:24px }
+  .page-title { font-size:22px }
+  .profile-page { padding:16px }
+}

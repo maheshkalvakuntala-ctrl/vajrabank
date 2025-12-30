@@ -1,0 +1,93 @@
+:root {
+    /* ================= LIGHT THEME (DEFAULT) ================= */
+    --bg-primary: #f8fafc;
+    /* Slate 50 */
+    --bg-secondary: #ffffff;
+    /* White */
+    --bg-card: #ffffff;
+
+    --text-primary: #0f172a;
+    /* Slate 900 */
+    --text-secondary: #64748b;
+    /* Slate 500 */
+    --text-accent: #3b82f6;
+    /* Blue 500 */
+
+    --border-color: #e2e8f0;
+    /* Slate 200 */
+    --divider-color: #f1f5f9;
+    /* Slate 100 */
+
+    --glass-bg: rgba(255, 255, 255, 0.8);
+    --glass-border: 1px solid rgba(226, 232, 240, 0.8);
+    --glass-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1);
+
+    --nav-bg: #1e293b;
+    /* Dark nav for contrast in light mode */
+    --nav-text: #f8fafc;
+}
+
+[data-theme='dark'] {
+    /* ================= DARK THEME (ENTERPRISE GLASS) ================= */
+    --bg-primary: #0f172a;
+    /* Slate 900 */
+    --bg-secondary: #1e293b;
+    /* Slate 800 */
+    --bg-card: rgba(30, 41, 59, 0.7);
+    /* Translucent slate */
+
+    --text-primary: #f8fafc;
+    /* Slate 50 */
+    --text-secondary: #94a3b8;
+    /* Slate 400 */
+    --text-accent: #60a5fa;
+    /* Blue 400 */
+
+    --border-color: rgba(255, 255, 255, 0.1);
+    --divider-color: rgba(255, 255, 255, 0.05);
+
+    /* Glass Overrides */
+    --glass-bg: rgba(30, 41, 59, 0.6);
+    --glass-border: 1px solid rgba(255, 255, 255, 0.1);
+    --glass-shadow: 0 8px 32px 0 rgba(0, 0, 0, 0.3);
+
+    --nav-bg: rgba(15, 23, 42, 0.9);
+    --nav-text: #f8fafc;
+}
+
+/* GLOBAL TRANSITIONS */
+body,
+.glass-card,
+.info-card,
+.stat-card,
+input,
+select,
+button {
+    transition: background-color 0.3s ease, color 0.3s ease, border-color 0.3s ease, box-shadow 0.3s ease;
+}
+
+/* GENERICS USING VARIABLES */
+body {
+    background-color: var(--bg-primary);
+    color: var(--text-primary);
+}
+
+h1,
+h2,
+h3,
+h4,
+h5,
+h6 {
+    color: var(--text-primary);
+}
+
+p,
+span,
+small {
+    color: var(--text-secondary);
+    /* Default, can be overridden */
+}
+
+a {
+    color: var(--text-accent);
+}

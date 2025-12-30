@@ -1,0 +1,40 @@
+/* Prevent horizontal overflow globally (pages should not create horizontal scroll) */
+html,
+body {
+  overflow-x: hidden;
+}
+
+/* Use border-box globally for predictable sizing */
+*,
+*::before,
+*::after {
+  box-sizing: border-box;
+}
+
+.admin-layout {
+  display: flex;
+  height: 100vh;
+  /* Full viewport height */
+  background: #0b1220;
+  overflow: hidden;
+  /* Prevent body scrolling */
+}
+
+.admin-main {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  height: 100vh;
+  min-width: 0;
+}
+
+.admin-content {
+  flex: 1;
+  /* Take remaining width */
+  overflow-y: auto;
+  /* Scroll ONLY the content area */
+  padding: 24px;
+  box-sizing: border-box;
+  background: #f8fafc;
+  /* separate background for content vs sidebar */
+}

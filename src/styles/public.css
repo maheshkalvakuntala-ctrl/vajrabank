@@ -1,0 +1,217 @@
+/* ================= PUBLIC ROOT ================= */
+.public-page {
+  background: #0b1220;
+  color: #ffffff;
+  min-height: 100vh;
+}
+
+/* ================= NAVBAR ================= */
+.navbar {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 18px 40px;
+  background: linear-gradient(90deg, #0a1f44, #081c2f);
+  position: sticky;
+  top: 0;
+  z-index: 100;
+}
+
+.navbar-logo {
+  font-size: 22px;
+  font-weight: 700;
+}
+
+.navbar-links {
+  display: flex;
+  gap: 60px;
+  list-style: none;
+}
+
+.nav-link {
+  color: #cfd8ff;
+  font-weight: 500;
+  position: relative;
+}
+
+.nav-link::after {
+  content: "";
+  position: absolute;
+  left: 0;
+  bottom: -6px;
+  width: 0%;
+  height: 2px;
+  background: #4da3ff;
+  transition: width 0.3s ease;
+}
+
+.nav-link:hover::after,
+.nav-link.active::after {
+  width: 100%;
+}
+
+/* ================= FOOTER ================= */
+footer {
+  padding: 30px;
+  background: linear-gradient(90deg, #081c2f, #0a1f44);
+  text-align: center;
+  margin-top: 60px;
+  color: #cfd8ff;
+}
+
+/* ================= HOME HERO ================= */
+.home-hero {
+  min-height: 90vh;
+  background: radial-gradient(circle at top, #102a44, #0b1220);
+  display: flex;
+  align-items: center;
+}
+
+.hero-container {
+  max-width: 1200px;
+  margin: auto;
+  padding: 0 60px;
+  display: grid;
+  grid-template-columns: 1.2fr 1fr;
+  gap: 60px;
+}
+
+.hero-left h1 {
+  font-size: 54px;
+  line-height: 1.1;
+}
+
+.hero-left h1 span {
+  color: #fbbf24;
+}
+
+.hero-left p {
+  margin: 20px 0;
+  color: #cfd8ff;
+  max-width: 500px;
+}
+
+.hero-actions {
+  display: flex;
+  gap: 15px;
+  margin-top: 25px;
+}
+
+/* ================= ABOUT PAGE ================= */
+.about-hero {
+  padding: 140px 40px;
+  text-align: center;
+  background:
+    linear-gradient(rgba(11,28,61,0.85), rgba(16,42,68,0.85)),
+    url("https://images.unsplash.com/photo-1520607162513-77705c0f0d4a");
+  background-size: cover;
+  background-position: center;
+}
+
+.about-hero h1 {
+  font-size: 52px;
+}
+
+.about-hero p {
+  margin-top: 12px;
+  font-size: 18px;
+  color: #cfd8ff;
+}
+
+.about-section {
+  max-width: 1200px;
+  margin: auto;
+  padding: 100px 40px;
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 60px;
+}
+
+.about-section p {
+  color: #e5e7eb;
+  line-height: 1.7;
+}
+
+/* ================= CONTACT PAGE ================= */
+.contact-hero {
+  padding: 140px 40px;
+  text-align: center;
+  background:
+    linear-gradient(rgba(2,6,23,0.75), rgba(2,6,23,0.75)),
+    url("https://img.freepik.com/free-photo/hot-line-contact-us-call-center-search-interface_53876-124009.jpg");
+  background-size: cover;
+  background-position: center;
+}
+
+.contact-hero h1 {
+  font-size: 48px;
+}
+
+.contact-main {
+  max-width: 1200px;
+  margin: auto;
+  padding: 100px 40px;
+  display: grid;
+  grid-template-columns: 1.2fr 1fr;
+  gap: 50px;
+}
+
+.contact-form {
+  background: rgba(255,255,255,0.08);
+  padding: 40px;
+  border-radius: 20px;
+}
+
+.contact-form input,
+.contact-form textarea {
+  width: 100%;
+  padding: 14px;
+  margin-bottom: 15px;
+  border-radius: 12px;
+  border: 1px solid rgba(255,255,255,0.2);
+  background: rgba(0,0,0,0.35);
+  color: white;
+}
+
+/* ================= TESTIMONIALS ================= */
+.testimonials-section {
+  padding: 100px 40px;
+  text-align: center;
+  background: radial-gradient(circle at top, #102a44, #0b1220);
+}
+
+.testimonial-card {
+  max-width: 900px;
+  margin: auto;
+  padding: 40px;
+  border-radius: 20px;
+  background: rgba(255,255,255,0.06);
+}
+
+.testimonial-text {
+  font-size: 18px;
+  color: #e5e7eb;
+  margin-bottom: 30px;
+}
+
+.testimonial-user {
+  display: flex;
+  justify-content: center;
+  gap: 15px;
+  align-items: center;
+}
+
+/* ================= RESPONSIVE ================= */
+@media (max-width: 900px) {
+  .hero-container,
+  .about-section,
+  .contact-main {
+    grid-template-columns: 1fr;
+    text-align: center;
+  }
+
+  .navbar-links {
+    flex-direction: column;
+    gap: 12px;
+  }
+}

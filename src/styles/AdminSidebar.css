@@ -1,0 +1,146 @@
+/* =========================
+   SIDEBAR CONTAINER
+========================= */
+.admin-sidebar {
+  /* Fixed-width sidebar using flexbox (exact 260px) */
+  width: 260px;
+  flex: 0 0 260px;
+  min-height: 100vh;
+  background: #16233e;
+  display: flex;
+  flex-direction: column;
+}
+
+/* =========================
+   HEADER
+========================= */
+.admin-sidebar-header {
+  padding: 22px;
+  border-bottom: 1px solid #24345c;
+  flex-shrink: 0;
+}
+
+.admin-sidebar-header h2 {
+  color: #ffffff;
+  font-size: 20px;
+  margin: 0;
+}
+
+.admin-sidebar-header p {
+  color: #9ca3af;
+  font-size: 13px;
+  margin-top: 4px;
+}
+
+/* =========================
+   MENU (SCROLLABLE)
+========================= */
+.admin-sidebar-menu {
+  list-style: none;
+  margin: 0;
+  padding: 12px 0;
+
+  flex: 1;
+  /* 🔥 takes remaining height */
+  overflow-y: auto;
+  /* 🔥 enables scrolling */
+  overflow-x: hidden;
+}
+
+/* Smooth scrollbar (optional) */
+.admin-sidebar-menu::-webkit-scrollbar {
+  width: 6px;
+}
+
+.admin-sidebar-menu::-webkit-scrollbar-thumb {
+  background: rgba(255, 255, 255, 0.15);
+  border-radius: 10px;
+}
+
+.admin-sidebar-menu li {
+  width: 100%;
+}
+
+.admin-sidebar-menu a {
+  display: flex;
+  align-items: center;
+  width: 100%;
+  padding: 14px 22px;
+  color: #e5e7eb;
+  text-decoration: none;
+  font-size: 15px;
+  position: relative;
+  transition: background 0.25s ease;
+}
+
+/* Hover */
+.admin-sidebar-menu a:hover {
+  background: rgba(255, 255, 255, 0.08);
+}
+
+/* Left indicator */
+.admin-sidebar-menu a::before {
+  content: "";
+  position: absolute;
+  left: 0;
+  /* use top/bottom to be robust across varying item heights */
+  top: 8px;
+  bottom: 8px;
+  height: auto;
+  width: 4px;
+  background: transparent;
+  border-radius: 0 4px 4px 0;
+  transition: background 0.25s ease;
+}
+
+/* Active */
+.admin-sidebar-menu a.active {
+  background: rgba(255, 255, 255, 0.14);
+  font-weight: 600;
+}
+
+.admin-sidebar-menu a.active::before {
+  background: #3b82f6;
+}
+
+/* Accessibility: visible focus for keyboard users */
+.admin-sidebar-menu a:focus-visible {
+  outline: 2px solid rgba(59, 130, 246, 0.9);
+  outline-offset: 2px;
+  border-radius: 6px;
+}
+
+/* Support aria-current as well as .active */
+.admin-sidebar-menu a[aria-current="page"] {
+  background: rgba(255, 255, 255, 0.14);
+  font-weight: 600;
+}
+
+/* =========================
+   FOOTER (PROFILE + LOGOUT)
+========================= */
+/* Footer section removed */
+
+/* NOTE: Layout sizing for .admin-layout and .admin-content
+   is managed in AdminLayout.css. Removed duplicate rules here
+   so main content relies solely on flexbox and uses width:100%.
+*/
+
+/* =========================
+   ANIMATIONS
+========================= */
+@keyframes fadeUp {
+  from {
+    opacity: 0;
+    transform: translateY(6px);
+  }
+
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+.admin-sidebar {
+  min-height: 100vh;
+}

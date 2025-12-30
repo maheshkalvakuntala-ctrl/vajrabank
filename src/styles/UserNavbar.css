@@ -1,0 +1,101 @@
+.user-navbar {
+    height: 64px;
+    background: rgb(25, 34, 63);
+    border-bottom: 1px solid #e5e7eb;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 0 32px;
+    position: sticky;
+    top: 0;
+    z-index: 50;
+    width: 100%;
+}
+
+.user-nav-links {
+    display: flex;
+    margin-left: 350px;
+    gap: 54px;
+}
+
+.user-nav-link {
+    color: white;
+    text-decoration: none;
+    font-weight: 500;
+    font-size: 14px;
+    transition: color 0.2s;
+}
+
+.user-nav-link:hover {
+    color: #3b82f6;
+}
+
+.user-nav-link.active {
+    color: #3b82f6;
+    font-weight: 600;
+}
+
+.user-profile-menu {
+    position: relative;
+}
+
+.profile-trigger {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    cursor: pointer;
+    padding: 4px 8px;
+    border-radius: 8px;
+    transition: background 0.2s;
+    background: none;
+    border: none;
+}
+
+.profile-trigger:hover {
+    background: rgb(26, 33, 68);
+}
+
+.profile-avatar {
+    width: 36px;
+    height: 36px;
+    background: #10b981;
+    /* Different color for User vs Admin */
+    color: white;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-weight: 600;
+    font-size: 14px;
+}
+
+/* Reuse Admin dropdown styles where possible, but for isolation we define them here too */
+.profile-dropdown {
+    position: absolute;
+    top: 120%;
+    right: 0;
+    width: 200px;
+    background: rgb(226, 232, 207);
+    border: 1px solid #e5e7eb;
+    border-radius: 12px;
+    box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06);
+    padding: 8px;
+    animation: fadeDown 0.2s ease;
+}
+
+.logout-btn {
+    width: 100%;
+    text-align: left;
+    padding: 8px 12px;
+    background: none;
+    border: none;
+    color: #ef4444;
+    font-size: 14px;
+    border-radius: 6px;
+    cursor: pointer;
+    transition: background 0.2s;
+}
+
+.logout-btn:hover {
+    background: #2a2a5e;
+}
