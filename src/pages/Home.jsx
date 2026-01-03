@@ -1,5 +1,7 @@
 import { useState } from "react";
+import { useNavigate, Link } from "react-router-dom";
 import FeatureCard from "../components/FeatureCard";
+import FeaturesShowcase from "../components/FeaturesShowcase";
 import features from "../data/featuresData";
 import "./Home.css";
 
@@ -105,16 +107,24 @@ const tracks = [
 
 export default function Home() {
   const [active, setActive] = useState(null);
+  const navigate = useNavigate();
+
+  const scrollToFeatures = () => {
+    const element = document.getElementById('features');
+    if (element) {
+      element.scrollIntoView({ behavior: 'smooth' });
+    }
+  };
 
   return (
     <>
-    
+
       {/* ================= HERO ================= */}
       <section className="hero-glass">
-        
+
         <div className="hero-overlay" />
         <div className="hero-inner">
-          <h1>
+          <h1 style={{ color: "white" }}>
             Banking that’s <span>Secure</span>, <span>Smart</span> & Built for India
           </h1>
           <p>
@@ -122,17 +132,20 @@ export default function Home() {
             security and powerful financial tools.
           </p>
           <div className="hero-actions">
-            <button className="btn-primary">Open Account</button>
-            <button className="btn-outline">Explore Features</button>
+            <button className="btn-primary" onClick={() => navigate('/signup')}>Create Account</button>
+            <button className="btn-outline" onClick={scrollToFeatures}>Explore Features</button>
           </div>
           <div className="trust-strip">
-            <span>🔐 RBI-Compliant</span>
-            <span>🛡️ 256-bit Encryption</span>
-            <span>⚡ Instant Transfers</span>
-            <span>📞 24/7 Support</span>
+            <span style={{ color: "white" }}>🔐 RBI-Compliant</span>
+            <span style={{ color: "white" }}>🛡️ 256-bit Encryption</span>
+            <span style={{ color: "white" }}>⚡ Instant Transfers</span>
+            <span style={{ color: "white" }}>📞 24/7 Support</span>
           </div>
         </div>
       </section>
+
+      {/* ================= FEATURES SHOWCASE ================= */}
+      <FeaturesShowcase />
 
       {/* ================= FEATURES ================= */}
       <section className="features-section">
@@ -150,7 +163,7 @@ export default function Home() {
 
       {/* ================= TRACK SELECTOR ================= */}
       <section className="track-section">
-        <h2>Choose the track that matches your context</h2>
+        <h2 style={{ color: "white" }}>Choose the track that matches your context</h2>
         <p className="track-sub">
           Different visitors use this site for different goals.
         </p>
@@ -162,7 +175,7 @@ export default function Home() {
               className={`track-card ${active === t.id ? "active" : ""}`}
               onClick={() => setActive(t.id)}
             >
-              <h3>{t.title}</h3>
+              <h3 style={{ color: "white" }}>{t.title}</h3>
               <p>{t.desc}</p>
             </div>
           ))}
@@ -170,7 +183,7 @@ export default function Home() {
 
         {active && (
           <div className="track-detail glass">
-            <h3>{tracks.find(t => t.id === active).detail.heading}</h3>
+            <h3 style={{ color: "white" }}>{tracks.find(t => t.id === active).detail.heading}</h3>
             <p>{tracks.find(t => t.id === active).detail.text}</p>
             <ul>
               {tracks

@@ -1,44 +1,48 @@
-/* Glass Theme - Now uses Global Variables from ThemeVariables.css */
+/* SOLID PROFESSIONAL THEME (Formerly GlassTheme) */
 
+/* Core Card Style - REPLACES GLASS */
 .glass-card {
-    background: var(--glass-bg);
-    backdrop-filter: blur(12px);
-    -webkit-backdrop-filter: blur(12px);
-    border: var(--glass-border);
-    border-radius: var(--glass-radius);
-    box-shadow: var(--glass-shadow);
-    transition: transform 0.2s ease, box-shadow 0.2s ease, background-color 0.3s ease;
+    background: var(--bg-card);
+    border: 1px solid var(--border-color);
+    border-radius: var(--radius-card);
+    box-shadow: var(--card-shadow);
+    padding: 24px;
+    /* Ensure consistent padding */
 }
 
 .glass-card:hover {
+    box-shadow: var(--hover-shadow);
     transform: translateY(-2px);
-    box-shadow: 0 12px 40px 0 rgba(0, 0, 0, 0.15);
-    /* Slightly stronger hover shadow */
+    /* Subtle lift */
 }
 
+/* Headers */
 .glass-header {
-    margin-bottom: 24px;
+    margin-bottom: 32px;
 }
 
 .glass-title {
     color: var(--text-primary);
-    font-size: 28px;
+    font-size: 24px;
     font-weight: 700;
     margin: 0;
+    letter-spacing: -0.5px;
 }
 
 .glass-subtitle {
     color: var(--text-secondary);
-    font-size: 16px;
-    margin-top: 4px;
+    font-size: 15px;
+    margin-top: 6px;
+    line-height: 1.5;
 }
 
+/* Data Tables - CLEAN & SOLID */
 .glass-table-container {
     overflow: hidden;
-    border-radius: var(--glass-radius);
-    border: var(--glass-border);
+    border-radius: var(--radius-card);
+    border: 1px solid var(--border-color);
     background: var(--bg-card);
-    /* Adaptive background */
+    box-shadow: var(--card-shadow);
 }
 
 .glass-table {
@@ -47,67 +51,88 @@
 }
 
 .glass-table thead {
-    background: var(--bg-secondary);
+    background: #f8fafc;
+    /* Very light gray header */
     border-bottom: 1px solid var(--border-color);
 }
 
 .glass-table th {
-    padding: 16px 24px;
+    padding: 14px 24px;
     text-align: left;
     font-weight: 600;
+    font-size: 13px;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
     color: var(--text-secondary);
 }
 
 .glass-table td {
     padding: 16px 24px;
     color: var(--text-primary);
-    border-bottom: 1px solid var(--border-color);
+    border-bottom: 1px solid var(--divider-color);
+    font-size: 14px;
 }
 
 .glass-table tr:last-child td {
     border-bottom: none;
 }
 
+.glass-table tr:hover td {
+    background-color: #f9fafb;
+    /* Row hover highlight */
+}
+
+/* Buttons - SOLID & TACTILE */
 .glass-btn {
-    background: var(--bg-card);
+    background: white;
     border: 1px solid var(--border-color);
-    padding: 8px 16px;
-    border-radius: 8px;
+    padding: 10px 18px;
+    border-radius: 6px;
     cursor: pointer;
-    font-weight: 500;
-    color: var(--text-primary);
+    font-weight: 600;
+    font-size: 14px;
+    color: var(--text-secondary);
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
     transition: all 0.2s;
 }
 
 .glass-btn:hover {
-    background: var(--bg-secondary);
-    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.05);
+    background: #f3f4f6;
+    color: var(--text-primary);
+    border-color: #d1d5db;
 }
 
 .glass-btn.primary {
-    background: #3b82f6;
+    background: var(--text-accent);
     color: white;
-    border: none;
+    border: 1px solid var(--text-accent);
 }
 
 .glass-btn.primary:hover {
-    background: #2563eb;
-    box-shadow: 0 4px 12px rgba(59, 130, 246, 0.3);
+    background: #1d4ed8;
+    box-shadow: 0 4px 6px -1px rgba(37, 99, 235, 0.2);
 }
 
+/* Inputs - CLEAN BORDERS */
 .glass-input {
     width: 100%;
     padding: 10px 14px;
-    border-radius: 8px;
+    border-radius: 6px;
     border: 1px solid var(--border-color);
-    background: var(--bg-secondary);
+    background: white;
     color: var(--text-primary);
     outline: none;
     font-size: 14px;
-    transition: border-color 0.2s;
+    transition: all 0.2s;
 }
 
 .glass-input:focus {
-    border-color: #3b82f6;
-    box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.1);
+    border-color: var(--text-accent);
+    box-shadow: 0 0 0 3px rgba(37, 99, 235, 0.1);
+}
+
+.glass-input::placeholder {
+    color: #9ca3af;
 }

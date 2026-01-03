@@ -1,15 +1,77 @@
-import React, { useMemo } from 'react';
+import React, { useMemo, useState, useEffect } from 'react';
 import { useBankData } from '../../hooks/useBankData';
 import { useAdminActions } from '../../hooks/useAdminActions';
 import DashboardStats from '../../components/admin/DashboardStats';
+import AdminAnalytics from '../../components/admin/AdminAnalytics';
 import AuditLogPanel from '../../components/admin/AuditLogPanel';
 import { NavLink } from 'react-router-dom';
-import { ArrowRight, ExclamationTriangle, FileText, CreditCard } from 'react-bootstrap-icons';
+import { ArrowRight, ExclamationTriangle, FileText, CreditCard, CheckCircle, XCircle } from 'react-bootstrap-icons';
+import { collection, query, where, getDocs, doc, updateDoc } from 'firebase/firestore';
+import { userDB } from '../../firebaseUser';
 import "../../styles/GlassTheme.css"; // Ensure Glass Theme is active
 
 export default function AdminDashboard() {
   const { data, loading, error } = useBankData();
   const { overrides, auditLogs } = useAdminActions();
+  const [pendingUsers, setPendingUsers] = useState([]);
+  const [loadingUsers, setLoadingUsers] = useState(true);
+
+  // Fetch pending users from Firestore
+  useEffect(() => {
+    const fetchPendingUsers = async () => {
+      try {
+        const q = query(collection(userDB, 'users'), where('status', '==', 'pending'));
+        const querySnapshot = await getDocs(q);
+        const users = [];
+        querySnapshot.forEach((doc) => {
+          users.push({ id: doc.id, ...doc.data() });
+        });
+        setPendingUsers(users);
+      } catch (error) {
+        console.error('Error fetching pending users:', error);
+      } finally {
+        setLoadingUsers(false);
+      }
+    };
+
+    fetchPendingUsers();
+  }, []);
+
+  // Approve user function
+  const approveUser = async (userId) => {
+    try {
+      await updateDoc(doc(userDB, 'users', userId), {
+        status: 'approved'
+      });
+
+      // Update local state
+      setPendingUsers(prev => prev.filter(user => user.id !== userId));
+
+      // Log the action
+      console.log(`User ${userId} approved`);
+    } catch (error) {
+      console.error('Error approving user:', error);
+      alert('Failed to approve user. Please try again.');
+    }
+  };
+
+  // Reject user function
+  const rejectUser = async (userId) => {
+    try {
+      await updateDoc(doc(userDB, 'users', userId), {
+        status: 'rejected'
+      });
+
+      // Update local state
+      setPendingUsers(prev => prev.filter(user => user.id !== userId));
+
+      // Log the action
+      console.log(`User ${userId} rejected`);
+    } catch (error) {
+      console.error('Error rejecting user:', error);
+      alert('Failed to reject user. Please try again.');
+    }
+  };
 
   // MERGE DATA FOR ACCURATE STATS
   const processedData = useMemo(() => {
@@ -41,6 +103,11 @@ export default function AdminDashboard() {
       {/* ROW 1: OVERVIEW METRICS */}
       <section style={{ marginBottom: '32px' }}>
         <DashboardStats data={processedData} />
+      </section>
+
+      {/* ANALYTICS SECTION */}
+      <section style={{ marginBottom: '32px' }}>
+        <AdminAnalytics data={processedData} />
       </section>
 
       {/* ROW 2: RISK & ALERTS */}
@@ -108,9 +175,88 @@ export default function AdminDashboard() {
         </div>
       </section>
 
-      {/* ROW 3: ACTIVITY & SYSTEM */}
-      <section>
-        <h3 style={{ fontSize: '18px', color: '#334155', marginBottom: '16px', fontWeight: '600' }}>System Activity</h3>
+      {/* USER APPROVAL SECTION */}
+      <section style={{ marginBottom: '32px' }}>
+        <h3 style={{ fontSize: '18px', color: '#334155', marginBottom: '16px', fontWeight: '600' }}>User Account Approvals</h3>
+
+        {loadingUsers ? (
+          <div className="glass-card" style={{ padding: '24px', textAlign: 'center' }}>
+            Loading pending approvals...
+          </div>
+        ) : pendingUsers.length === 0 ? (
+          <div className="glass-card" style={{ padding: '24px', textAlign: 'center', color: '#64748b' }}>
+            <CheckCircle size={24} style={{ marginBottom: '8px' }} />
+            <p>No pending user approvals</p>
+          </div>
+        ) : (
+          <div style={{ display: 'grid', gap: '16px' }}>
+            {pendingUsers.map((user) => (
+              <div key={user.id} className="glass-card" style={{ padding: '20px', display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+                <div style={{ flex: 1 }}>
+                  <h4 style={{ margin: '0 0 8px 0', color: '#0f172a', fontSize: '16px' }}>
+                    {user.firstName} {user.lastName}
+                  </h4>
+                  <p style={{ margin: '0 0 4px 0', color: '#64748b', fontSize: '14px' }}>
+                    {user.email}
+                  </p>
+                  <p style={{ margin: '0 0 4px 0', color: '#64748b', fontSize: '14px' }}>
+                    Mobile: {user.mobile} | Account: {user.accountType}
+                  </p>
+                  <p style={{ margin: '0 0 4px 0', color: '#64748b', fontSize: '12px', fontStyle: 'italic' }}>
+                    Requested on: {user.createdAt?.toDate().toLocaleDateString()} {user.createdAt?.toDate().toLocaleTimeString()}
+                  </p>
+                  <p style={{ margin: 0, color: '#f59e0b', fontSize: '13px', fontWeight: '500' }}>
+                    Status: Pending Approval
+                  </p>
+                </div>
+                <div style={{ display: 'flex', gap: '12px' }}>
+                  <button
+                    onClick={() => approveUser(user.id)}
+                    style={{
+                      background: '#10b981',
+                      color: 'white',
+                      border: 'none',
+                      padding: '8px 16px',
+                      borderRadius: '6px',
+                      cursor: 'pointer',
+                      display: 'flex',
+                      alignItems: 'center',
+                      gap: '6px',
+                      fontSize: '14px',
+                      fontWeight: '500'
+                    }}
+                  >
+                    <CheckCircle size={16} />
+                    Approve
+                  </button>
+                  <button
+                    onClick={() => rejectUser(user.id)}
+                    style={{
+                      background: '#ef4444',
+                      color: 'white',
+                      border: 'none',
+                      padding: '8px 16px',
+                      borderRadius: '6px',
+                      cursor: 'pointer',
+                      display: 'flex',
+                      alignItems: 'center',
+                      gap: '6px',
+                      fontSize: '14px',
+                      fontWeight: '500'
+                    }}
+                  >
+                    <XCircle size={16} />
+                    Reject
+                  </button>
+                </div>
+              </div>
+            ))}
+          </div>
+        )}
+      </section>
+
+      {/* AUDIT LOG & SYSTEM STATUS SECTION */}
+      <section style={{ marginBottom: '32px' }}>
         <div style={{ display: 'grid', gridTemplateColumns: '2fr 1fr', gap: '24px' }}>
 
           {/* AUDIT LOG (Left, Large) */}
@@ -127,11 +273,11 @@ export default function AdminDashboard() {
             <div style={{ flex: 1, display: 'flex', flexDirection: 'column', gap: '16px' }}>
               <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
                 <span style={{ color: '#64748b', fontSize: '14px' }}>Core Banking API</span>
-                <span style={{ color: '#10b981', fontWeight: '600', fontSize: '13px', display: 'flex', alignItems: 'center', gap: '6px' }}><div style={{ width: '6px', height: '6px', borderRadius: '50%', background: '#10b981' }}></div> Online</span>
+                <span style={{ color: '#10b981', fontWeight: '600', fontSize: '13px', display: 'flex', alignItems: 'center', gap: '6px' }}><span style={{ width: '6px', height: '6px', borderRadius: '50%', background: '#10b981', display: 'inline-block' }}></span> Online</span>
               </div>
               <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
                 <span style={{ color: '#64748b', fontSize: '14px' }}>Transaction DB</span>
-                <span style={{ color: '#10b981', fontWeight: '600', fontSize: '13px', display: 'flex', alignItems: 'center', gap: '6px' }}><div style={{ width: '6px', height: '6px', borderRadius: '50%', background: '#10b981' }}></div> Connected</span>
+                <span style={{ color: '#10b981', fontWeight: '600', fontSize: '13px', display: 'flex', alignItems: 'center', gap: '6px' }}><span style={{ width: '6px', height: '6px', borderRadius: '50%', background: '#10b981', display: 'inline-block' }}></span> Connected</span>
               </div>
               <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
                 <span style={{ color: '#64748b', fontSize: '14px' }}>Gateway Latency</span>

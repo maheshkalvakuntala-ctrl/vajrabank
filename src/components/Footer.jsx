@@ -13,7 +13,7 @@ export default function Footer() {
         {/* BRAND */}
         <div className="footer-brand">
           <h2>VajraBank</h2>
-          <p>
+          <p style={{color:"white"}}>
             India's most trusted digital bank. Secure, seamless, and
             designed for the modern lifestyle.
           </p>
@@ -71,17 +71,17 @@ export default function Footer() {
 
         {/* CONTACT */}
         <div className="footer-contact">
-          <h4>Contact Us</h4>
-          <p>📞 1800-VAJRA-BANK</p>
-          <span>24/7 Customer Support</span>
-          <p>✉ support@vajrabank.com</p>
-          <p>📍 VajraBank Tower, BKC, Mumbai 400051</p>
+          <h4 style={{color:"white"}}>Contact Us</h4>
+          <p style={{color:"white"}}>📞 1800-VAJRA-BANK</p>
+          <span style={{color:"white"}}>24/7 Customer Support</span>
+          <p style={{color:"white"}}>✉ support@vajrabank.com</p>
+          <p style={{color:"white"}}>📍 VajraBank Tower, BKC, Mumbai 400051</p>
         </div>
       </div>
 
       {/* BOTTOM BAR */}
       <div className="footer-bottom">
-        <p>© 2024 VajraBank. All rights reserved.</p>
+        <p style={{color:"white"}}>© 2024 VajraBank. All rights reserved.</p>
         <div className="footer-policy">
           <a href="#">Privacy Policy</a>
           <a href="#">Terms of Service</a>
