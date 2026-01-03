@@ -1,10 +1,8 @@
 import { useMemo, useState, useEffect } from 'react';
 import { useAuth } from '../context/AuthContext';
-import { useBankData } from './useBankData';
 
 export const useCurrentUser = () => {
     const { user: authUser } = useAuth();
-    const { data, loading, error } = useBankData();
     const [localUpdates, setLocalUpdates] = useState({});
 
     // Load local updates on mount
@@ -29,27 +27,28 @@ export const useCurrentUser = () => {
     };
 
     const currentUser = useMemo(() => {
-        if (!authUser || !data) return null;
+        if (!authUser) return null;
 
-        let baseUser = data.find(c => c.email.toLowerCase() === authUser.email.toLowerCase());
+        const baseUser = {
+            ...authUser,
+            ...localUpdates,
+            firstName: authUser.firstName || authUser.displayName?.split(' ')[0] || 'User',
+            lastName: authUser.lastName || authUser.displayName?.split(' ').slice(1).join(' ') || '',
+            fullName: authUser.displayName || `${authUser.firstName || 'User'} ${authUser.lastName || ''}`.trim(),
+            balance: authUser.balance || 0,
+            transactions: authUser.transactions || [],
+            loans: authUser.loans || [],
+            kycStatus: authUser.kycStatus || 'Verified',
+            accountStatus: authUser.activeStatus || authUser.accountStatus || 'Active',
+            accountType: authUser.accountType || 'Savings'
+        };
 
-        // Fallback for demo
-        if (!baseUser && data.length > 0) {
-            baseUser = data[0];
-        }
+        return baseUser;
+    }, [authUser, localUpdates]);
 
-        if (baseUser) {
-            return {
-                ...baseUser,
-                ...localUpdates, // Apply local overrides (phone, address, etc)
-                firstName: baseUser.fullName.split(' ')[0],
-                kycStatus: baseUser.kycStatus || 'Verified',
-                accountStatus: baseUser.activeStatus || 'Active'
-            };
-        }
-
-        return null;
-    }, [authUser, data, localUpdates]);
-
-    return { currentUser, loading, error, updateUserProfile };
+    return {
+        currentUser,
+        loading: false, // AuthContext handles loading
+        updateUserProfile
+    };
 };

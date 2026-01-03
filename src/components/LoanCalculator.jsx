@@ -37,7 +37,7 @@ export default function LoanCalculator() {
     <div className="loan-calculator glass">
       {/* LEFT SIDE */}
       <div className="loan-form">
-        <h3>Loan EMI calculator</h3>
+        <h3 style={{color:"white"}}>Loan EMI calculator</h3>
         <p className="loan-sub">
           Estimate an approximate monthly instalment for a term loan based on
           the loan amount, interest rate, and tenure.
@@ -77,24 +77,24 @@ export default function LoanCalculator() {
 
       {/* RIGHT SIDE */}
       <div className="loan-results">
-        <h4>Estimated results</h4>
+        <h4 style={{color:"white"}}>Estimated results</h4>
 
         <div className="result-row">
-          <span>Approximate monthly EMI</span>
+          <span style={{color:"white"}}>Approximate monthly EMI</span>
           <span className="result-value">
             ₹{emi.toLocaleString(undefined, { maximumFractionDigits: 2 })}
           </span>
         </div>
 
         <div className="result-row">
-          <span>Total interest over tenure</span>
+          <span style={{color:"white"}}>Total interest over tenure</span>
           <span className="result-value">
             ₹{totalInterest.toLocaleString(undefined, { maximumFractionDigits: 2 })}
           </span>
         </div>
 
         <div className="result-row">
-          <span>Total amount payable</span>
+          <span style={{color:"white"}}>Total amount payable</span>
           <span className="result-value">
             ₹{totalPayable.toLocaleString(undefined, { maximumFractionDigits: 2 })}
           </span>

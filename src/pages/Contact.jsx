@@ -74,26 +74,26 @@ emailjs.send(
       <section className="contact-info">
         <div className="info-card">
           <h3>📞 Phone Support</h3>
-          <p>1800-VAJRA-BANK (Toll Free)</p>
-          <p>+91 22 4567 8900</p>
+          <p style={{color:"white"}}>1800-VAJRA-BANK (Toll Free)</p>
+          <p style={{color:"white"}}>+91 22 4567 8900</p>
         </div>
 
         <div className="info-card">
           <h3>✉️ Email Us</h3>
-          <p>support@vajrabank.com</p>
-          <p>corporate@vajrabank.com</p>
+          <p style={{color:"white"}}>support@vajrabank.com</p>
+          <p style={{color:"white"}}>corporate@vajrabank.com</p>
         </div>
 
         <div className="info-card">
           <h3>📍 Head Office</h3>
-          <p>VajraBank Tower, BKC</p>
-          <p>Mumbai, Maharashtra 400051</p>
+          <p style={{color:"white"}}>VajraBank Tower, BKC</p>
+          <p style={{color:"white"}}>Mumbai, Maharashtra 400051</p>
         </div>
 
         <div className="info-card">
-          <h3>⏰ Working Hours</h3>
-          <p>Mon–Sat: 9:00 AM – 6:00 PM</p>
-          <p>24/7 Phone Banking</p>
+          <h3 style={{color:"white"}}>⏰ Working Hours</h3>
+          <p style={{color:"white"}}>Mon - Sat: 9:00 AM - 6:00 PM</p>
+          <p style={{color:"white"}}>24/7 Phone Banking</p>
         </div>
       </section>
 
@@ -160,16 +160,16 @@ emailjs.send(
         {/* QUICK SUPPORT */}
         <div className="quick-support">
           <div className="support-card dark">
-            <h3>🎧 24/7 Phone Banking</h3>
-            <p>
+            <h3 style={{color:"white"}}>🎧 24/7 Phone Banking</h3>
+            <p style={{color:"white"}}>
               Get instant assistance for account queries, transactions, and more.
             </p>
             <strong>1800-VAJRA-BANK</strong>
           </div>
 
 <div className="support-card">
-  <h3>💬 Live Chat Support</h3>
-  <p>Chat with our support team in real time.</p>
+  <h3 style={{color:"white"}}>💬 Live Chat Support</h3>
+  <p style={{color:"white"}}>Chat with our support team in real time.</p>
 
   <a
     href="https://wa.me/916300608164?text=Hi%20VajraBank%20Support,%20I%20need%20assistance"
@@ -183,8 +183,8 @@ emailjs.send(
 
 
           <div className="support-card">
-            <h3>🏦 Visit a Branch</h3>
-            <p>Find your nearest VajraBank branch.</p>
+            <h3 style={{color:"white"}}>🏦 Visit a Branch</h3>
+            <p style={{color:"white"}}>Find your nearest VajraBank branch.</p>
           </div>
         </div>
       </section>

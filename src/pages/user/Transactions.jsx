@@ -8,23 +8,17 @@ export default function Transactions() {
   const [selectedTxn, setSelectedTxn] = useState(null);
   const [page, setPage] = useState(1);
 
-  // SIMULATE TRANSACTIONS (Deterministic)
+  // GET REAL TRANSACTIONS
   const allTransactions = useMemo(() => {
-    if (!currentUser) return [];
-    return Array.from({ length: 45 }).map((_, i) => {
-      const isCredit = i % 3 === 0;
-      const amount = (i + 1) * 240 + 50;
-      return {
-        id: `TXN-${currentUser.customerId}-${1000 + i}`,
-        date: new Date(Date.now() - i * 86400000 * 1.5).toLocaleDateString(),
-        description: isCredit ? 'Deposit via UPI' : `Payment to ${['Amazon', 'Uber', 'Netflix', 'Swiggy', 'Electricity Bill'][i % 5]}`,
-        type: isCredit ? 'Credit' : 'Debit',
-        amount: amount,
-        status: 'Success',
-        refId: `REF${Math.random().toString(36).substr(2, 9).toUpperCase()}`,
-        balanceAfter: Math.round(currentUser.balance - (i * 500)) // Mock logic
-      };
-    });
+    if (!currentUser || !currentUser.transactions) return [];
+
+    // Convert to the format expected by the table if different
+    return currentUser.transactions.map(t => ({
+      ...t,
+      description: t.reason || (t.type === 'Deposit' ? 'Deposit' : 'Withdrawal'),
+      date: new Date(t.date).toLocaleDateString(),
+      status: 'Success' // All records in dataset are historical successes
+    }));
   }, [currentUser]);
 
   // FILTER & PAGINATE
@@ -60,48 +54,56 @@ export default function Transactions() {
       </div>
 
       {/* TABLE */}
-      <div style={{ background: 'white', borderRadius: '16px', border: '1px solid #e2e8f0', overflow: 'hidden' }}>
-        <table style={{ width: '100%', borderCollapse: 'collapse' }}>
-          <thead style={{ background: '#f8fafc', borderBottom: '1px solid #e2e8f0' }}>
-            <tr>
-              <th style={{ padding: '16px 24px', textAlign: 'left', fontWeight: '600', color: '#64748b' }}>Date</th>
-              <th style={{ padding: '16px 24px', textAlign: 'left', fontWeight: '600', color: '#64748b' }}>Description</th>
-              <th style={{ padding: '16px 24px', textAlign: 'left', fontWeight: '600', color: '#64748b' }}>Ref ID</th>
-              <th style={{ padding: '16px 24px', textAlign: 'right', fontWeight: '600', color: '#64748b' }}>Amount</th>
-              <th style={{ padding: '16px 24px', textAlign: 'center', fontWeight: '600', color: '#64748b' }}>Status</th>
-            </tr>
-          </thead>
-          <tbody>
-            {pagedTxns.map(txn => (
-              <tr key={txn.id} onClick={() => setSelectedTxn(txn)} style={{ borderBottom: '1px solid #f1f5f9', cursor: 'pointer', transition: 'background 0.2s' }} onMouseEnter={(e) => e.currentTarget.style.background = '#f8fafc'} onMouseLeave={(e) => e.currentTarget.style.background = 'white'}>
-                <td style={{ padding: '16px 24px', color: '#334155' }}>{txn.date}</td>
-                <td style={{ padding: '16px 24px', fontWeight: '500' }}>
-                  <div style={{ display: 'flex', alignItems: 'center', gap: '12px' }}>
-                    <div style={{ width: '32px', height: '32px', borderRadius: '50%', background: txn.type === 'Credit' ? '#f0fdf4' : '#fef2f2', display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: '14px' }}>
-                      {txn.type === 'Credit' ? '↓' : '↑'}
-                    </div>
-                    {txn.description}
-                  </div>
-                </td>
-                <td style={{ padding: '16px 24px', color: '#64748b', fontSize: '13px', fontFamily: 'monospace' }}>{txn.id}</td>
-                <td style={{ padding: '16px 24px', textAlign: 'right', fontWeight: '600', color: txn.type === 'Credit' ? '#166534' : '#1e293b' }}>
-                  {txn.type === 'Credit' ? '+' : '-'}₹{txn.amount.toLocaleString()}
-                </td>
-                <td style={{ padding: '16px 24px', textAlign: 'center' }}>
-                  <span style={{ background: '#dcfce7', color: '#166534', padding: '4px 12px', borderRadius: '20px', fontSize: '12px', fontWeight: '600' }}>Success</span>
-                </td>
-              </tr>
-            ))}
-          </tbody>
-        </table>
-
-        {/* PAGINATION */}
-        <div style={{ padding: '16px 24px', borderTop: '1px solid #e2e8f0', display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
-          <button disabled={page === 1} onClick={() => setPage(p => p - 1)} style={{ padding: '8px 16px', borderRadius: '8px', border: '1px solid #e2e8f0', background: 'white', cursor: page === 1 ? 'not-allowed' : 'pointer', color: page === 1 ? '#cbd5e1' : '#334155' }}>Previous</button>
-          <span style={{ color: '#64748b' }}>Page {page} of {totalPages}</span>
-          <button disabled={page === totalPages} onClick={() => setPage(p => p + 1)} style={{ padding: '8px 16px', borderRadius: '8px', border: '1px solid #e2e8f0', background: 'white', cursor: page === totalPages ? 'not-allowed' : 'pointer', color: page === totalPages ? '#cbd5e1' : '#334155' }}>Next</button>
+      {filteredTxns.length === 0 ? (
+        <div style={{ background: 'white', borderRadius: '16px', border: '1px solid #e2e8f0', padding: '60px 20px', textAlign: 'center' }}>
+          <div style={{ fontSize: '48px', marginBottom: '20px' }}>💸</div>
+          <h3 style={{ margin: '0 0 8px 0', color: '#0f172a' }}>No Transactions Yet</h3>
+          <p style={{ margin: 0, color: '#64748b' }}>Your transaction history will appear here once you start using your account.</p>
         </div>
-      </div>
+      ) : (
+        <div style={{ background: 'white', borderRadius: '16px', border: '1px solid #e2e8f0', overflow: 'hidden' }}>
+          <table style={{ width: '100%', borderCollapse: 'collapse' }}>
+            <thead style={{ background: '#f8fafc', borderBottom: '1px solid #e2e8f0' }}>
+              <tr>
+                <th style={{ padding: '16px 24px', textAlign: 'left', fontWeight: '600', color: '#64748b' }}>Date</th>
+                <th style={{ padding: '16px 24px', textAlign: 'left', fontWeight: '600', color: '#64748b' }}>Description</th>
+                <th style={{ padding: '16px 24px', textAlign: 'left', fontWeight: '600', color: '#64748b' }}>Ref ID</th>
+                <th style={{ padding: '16px 24px', textAlign: 'right', fontWeight: '600', color: '#64748b' }}>Amount</th>
+                <th style={{ padding: '16px 24px', textAlign: 'center', fontWeight: '600', color: '#64748b' }}>Status</th>
+              </tr>
+            </thead>
+            <tbody>
+              {pagedTxns.map(txn => (
+                <tr key={txn.id} onClick={() => setSelectedTxn(txn)} style={{ borderBottom: '1px solid #f1f5f9', cursor: 'pointer', transition: 'background 0.2s' }} onMouseEnter={(e) => e.currentTarget.style.background = '#f8fafc'} onMouseLeave={(e) => e.currentTarget.style.background = 'white'}>
+                  <td style={{ padding: '16px 24px', color: '#334155' }}>{txn.date}</td>
+                  <td style={{ padding: '16px 24px', fontWeight: '500' }}>
+                    <div style={{ display: 'flex', alignItems: 'center', gap: '12px' }}>
+                      <div style={{ width: '32px', height: '32px', borderRadius: '50%', background: txn.type === 'Credit' ? '#f0fdf4' : '#fef2f2', display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: '14px' }}>
+                        {txn.type === 'Credit' ? '↓' : '↑'}
+                      </div>
+                      {txn.description}
+                    </div>
+                  </td>
+                  <td style={{ padding: '16px 24px', color: '#64748b', fontSize: '13px', fontFamily: 'monospace' }}>{txn.id}</td>
+                  <td style={{ padding: '16px 24px', textAlign: 'right', fontWeight: '600', color: txn.type === 'Credit' ? '#166534' : '#1e293b' }}>
+                    {txn.type === 'Credit' ? '+' : '-'}₹{txn.amount.toLocaleString()}
+                  </td>
+                  <td style={{ padding: '16px 24px', textAlign: 'center' }}>
+                    <span style={{ background: '#dcfce7', color: '#166534', padding: '4px 12px', borderRadius: '20px', fontSize: '12px', fontWeight: '600' }}>Success</span>
+                  </td>
+                </tr>
+              ))}
+            </tbody>
+          </table>
+
+          {/* PAGINATION */}
+          <div style={{ padding: '16px 24px', borderTop: '1px solid #e2e8f0', display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+            <button disabled={page === 1} onClick={() => setPage(p => p - 1)} style={{ padding: '8px 16px', borderRadius: '8px', border: '1px solid #e2e8f0', background: 'white', cursor: page === 1 ? 'not-allowed' : 'pointer', color: page === 1 ? '#cbd5e1' : '#334155' }}>Previous</button>
+            <span style={{ color: '#64748b' }}>Page {page} of {totalPages}</span>
+            <button disabled={page === totalPages} onClick={() => setPage(p => p + 1)} style={{ padding: '8px 16px', borderRadius: '8px', border: '1px solid #e2e8f0', background: 'white', cursor: page === totalPages ? 'not-allowed' : 'pointer', color: page === totalPages ? '#cbd5e1' : '#334155' }}>Next</button>
+          </div>
+        </div>
+      )}
 
       {/* DETAIL MODAL */}
       {selectedTxn && (

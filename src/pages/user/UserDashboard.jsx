@@ -1,5 +1,6 @@
 import React, { useState } from 'react';
 import { useCurrentUser } from '../../hooks/useCurrentUser';
+import UserAnalytics from '../../components/user/UserAnalytics';
 import { ArrowUpRight, Plus, Download, ShieldCheck, Wallet, GraphUpArrow, X, CheckCircle } from 'react-bootstrap-icons';
 import '../../styles/Dashboard.css';
 import { NavLink } from 'react-router-dom';
@@ -114,7 +115,7 @@ export default function UserDashboard() {
         <div style={{ display: 'flex', flexDirection: 'column', gap: '24px' }}>
 
           {/* QUICK ACTIONS */}
-          <div className="quick-actions" style={{ padding: '0' }}>
+          {/* <div className="quick-actions" style={{ padding: '0' }}>
             <h3 style={{ fontSize: '18px', color: '#334155', marginBottom: '16px' }}>Quick Actions</h3>
             <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '12px' }}>
               <button onClick={() => setShowModal('transfer')} className="btn" style={{ background: '#3b82f6', color: 'white', border: 'none', justifyContent: 'center', cursor: 'pointer' }}>
@@ -130,7 +131,7 @@ export default function UserDashboard() {
                 ⋯ More
               </button>
             </div>
-          </div>
+          </div> */}
 
           {/* ACCOUNT DETAILS */}
           <div className="info-card" style={{ padding: '24px' }}>
@@ -151,7 +152,7 @@ export default function UserDashboard() {
 
         </div>
 
-        {/* RIGHT COL: RECENT TRANSACTIONS (MOCKED) */}
+        {/* RIGHT COL: RECENT TRANSACTIONS */}
         <div className="info-card" style={{ padding: '0', overflow: 'hidden' }}>
           <div style={{ padding: '24px', borderBottom: '1px solid #f1f5f9', display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
             <h3 style={{ margin: 0, fontSize: '18px', color: '#334155' }}>Recent Transactions</h3>
@@ -159,26 +160,32 @@ export default function UserDashboard() {
           </div>
 
           <div>
-            {[1, 2, 3, 4].map((i) => (
-              <div key={i} className="transaction-item" style={{ padding: '16px 24px', cursor: 'pointer' }}>
-                <div style={{ display: 'flex', alignItems: 'center', gap: '16px' }}>
-                  <div style={{ width: '40px', height: '40px', borderRadius: '50%', background: i % 2 === 0 ? '#f0fdf4' : '#fef2f2', display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: '18px' }}>
-                    {i % 2 === 0 ? '↓' : '↑'}
+            {currentUser.transactions && currentUser.transactions.length > 0 ? (
+              currentUser.transactions.slice(0, 5).map((txn, i) => (
+                <div key={i} className="transaction-item" style={{ padding: '16px 24px', cursor: 'pointer', display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+                  <div style={{ display: 'flex', alignItems: 'center', gap: '16px' }}>
+                    <div style={{ width: '40px', height: '40px', borderRadius: '50%', background: txn.type === 'Deposit' ? '#f0fdf4' : '#fef2f2', display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: '18px' }}>
+                      {txn.type === 'Deposit' ? '↓' : '↑'}
+                    </div>
+                    <div>
+                      <strong style={{ display: 'block', color: '#0f172a' }}>{txn.reason || (txn.type === 'Deposit' ? 'Deposit' : 'Withdrawal')}</strong>
+                      <small style={{ color: '#64748b' }}>{new Date(txn.date).toLocaleDateString()}</small>
+                    </div>
                   </div>
-                  <div>
-                    <strong style={{ display: 'block', color: '#0f172a' }}>{i % 2 === 0 ? 'Received from Client' : 'Payment to Amazon'}</strong>
-                    <small style={{ color: '#64748b' }}>Today, 10:23 AM</small>
+                  <div style={{ fontWeight: '600', color: txn.type === 'Deposit' ? '#166534' : '#991b1b' }}>
+                    {txn.type === 'Deposit' ? '+' : '-'}₹{txn.amount.toLocaleString()}
                   </div>
                 </div>
-                <div style={{ fontWeight: '600', color: i % 2 === 0 ? '#166534' : '#991b1b' }}>
-                  {i % 2 === 0 ? '+' : '-'}₹{(i * 1250).toLocaleString()}
-                </div>
-              </div>
-            ))}
+              ))
+            ) : (
+              <div style={{ padding: '40px', textAlign: 'center', color: '#94a3b8' }}>No recent transactions found.</div>
+            )}
           </div>
         </div>
-
       </div>
+
+      {/* ANALYTICS SECTION */}
+      <UserAnalytics />
 
       {/* TRANSFER MODAL */}
       {showModal === 'transfer' && (

@@ -19,7 +19,7 @@ export default function Testimonials() {
     <section className="testimonials-section">
       <div className="testimonials-header">
         <span className="testimonials-tag">TESTIMONIALS</span>
-        <h2>Loved by Thousands</h2>
+        <h2 style={{color:"white"}}>Loved by Thousands</h2>
         <p>
           Don't just take our word for it. Here's what our customers have to say.
         </p>
@@ -35,7 +35,7 @@ export default function Testimonials() {
         <div className="testimonial-user">
           <img src={current.image} alt={current.name} />
           <div>
-            <h4>{current.name}</h4>
+            <h4 style={{color:"white"}}>{current.name}</h4>
             <span>{current.role}</span>
           </div>
         </div>

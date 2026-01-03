@@ -1,75 +1,66 @@
 :root {
-    /* ================= LIGHT THEME (DEFAULT) ================= */
-    --bg-primary: #f8fafc;
-    /* Slate 50 */
+    /* ================= SOLID PROFESSIONAL BANKING THEME ================= */
+
+    /* Backgrounds */
+    --bg-primary: #f3f4f6;
+    /* Light Gray / Off-White Page Background */
     --bg-secondary: #ffffff;
-    /* White */
+    /* Pure White */
     --bg-card: #ffffff;
+    /* Solid White Cards */
 
-    --text-primary: #0f172a;
-    /* Slate 900 */
-    --text-secondary: #64748b;
-    /* Slate 500 */
-    --text-accent: #3b82f6;
-    /* Blue 500 */
+    /* Typography - High Contrast */
+    --text-primary: #111827;
+    /* Gray 900 - Sharp Dark Text */
+    --text-secondary: #4b5563;
+    /* Gray 600 - Muted Text */
+    --text-accent: #2563eb;
+    /* Blue 600 - Primary Action Color */
+    --text-inverse: #ffffff;
+    /* White text for dark backgrounds (nav) */
 
-    --border-color: #e2e8f0;
-    /* Slate 200 */
-    --divider-color: #f1f5f9;
-    /* Slate 100 */
+    /* Borders & Dividers */
+    --border-color: #e5e7eb;
+    /* Gray 200 */
+    --divider-color: #f3f4f6;
+    /* Gray 100 */
 
-    --glass-bg: rgba(255, 255, 255, 0.8);
-    --glass-border: 1px solid rgba(226, 232, 240, 0.8);
-    --glass-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1);
+    /* Shadows (Subtle, No Glows) */
+    --card-shadow: 0 1px 3px 0 rgba(0, 0, 0, 0.1), 0 1px 2px -1px rgba(0, 0, 0, 0.1);
+    --hover-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06);
+    --radius-card: 8px;
+    /* Standard rounded corners */
 
+    /* Navigation (Professional Navy) */
     --nav-bg: #1e293b;
-    /* Dark nav for contrast in light mode */
+    /* Slate 800 - Deep Navy */
     --nav-text: #f8fafc;
-}
-
-[data-theme='dark'] {
-    /* ================= DARK THEME (ENTERPRISE GLASS) ================= */
-    --bg-primary: #0f172a;
-    /* Slate 900 */
-    --bg-secondary: #1e293b;
-    /* Slate 800 */
-    --bg-card: rgba(30, 41, 59, 0.7);
-    /* Translucent slate */
-
-    --text-primary: #f8fafc;
-    /* Slate 50 */
-    --text-secondary: #94a3b8;
+    /* White Text */
+    --nav-text-muted: #94a3b8;
     /* Slate 400 */
-    --text-accent: #60a5fa;
-    /* Blue 400 */
+    --nav-active-bg: rgba(255, 255, 255, 0.1);
+    --nav-border: none;
 
-    --border-color: rgba(255, 255, 255, 0.1);
-    --divider-color: rgba(255, 255, 255, 0.05);
+    /* Status Colors */
+    --color-success: #10b981;
+    --color-warning: #f59e0b;
+    --color-danger: #ef4444;
+    --color-info: #3b82f6;
 
-    /* Glass Overrides */
-    --glass-bg: rgba(30, 41, 59, 0.6);
-    --glass-border: 1px solid rgba(255, 255, 255, 0.1);
-    --glass-shadow: 0 8px 32px 0 rgba(0, 0, 0, 0.3);
-
-    --nav-bg: rgba(15, 23, 42, 0.9);
-    --nav-text: #f8fafc;
+    /* Legacy Glass Map (Mapped to Solid for Compatibility) */
+    --glass-bg: #ffffff;
+    --glass-border: 1px solid #e5e7eb;
+    --glass-shadow: var(--card-shadow);
+    --glass-radius: 8px;
 }
 
-/* GLOBAL TRANSITIONS */
-body,
-.glass-card,
-.info-card,
-.stat-card,
-input,
-select,
-button {
-    transition: background-color 0.3s ease, color 0.3s ease, border-color 0.3s ease, box-shadow 0.3s ease;
-}
-
-/* GENERICS USING VARIABLES */
+/* GLOBAL RESET & BASE STYLES */
 body {
     background-color: var(--bg-primary);
     color: var(--text-primary);
+    margin: 0;
+    font-family: 'Inter', system-ui, -apple-system, sans-serif;
+    -webkit-font-smoothing: antialiased;
 }
 
 h1,
@@ -85,9 +76,43 @@ p,
 span,
 small {
     color: var(--text-secondary);
-    /* Default, can be overridden */
 }
 
 a {
     color: var(--text-accent);
+    color: var(--text-accent);
+    text-decoration: none;
+    transition: color 0.2s;
+}
+
+a:hover,
+button:hover {
+    text-decoration: none;
+}
+
+/* GLOBAL UTILITY CLASSES */
+.text-danger {
+    color: var(--color-danger);
+}
+
+.text-warning {
+    color: var(--color-warning);
+}
+
+.text-success {
+    color: var(--color-success);
+}
+
+.text-primary {
+    color: var(--color-info);
+}
+
+/* TRANSITIONS */
+.card,
+.btn,
+input,
+select,
+button,
+a {
+    transition: all 0.2s ease;
 }
