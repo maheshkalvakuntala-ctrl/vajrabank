@@ -86,8 +86,8 @@ emailjs.send(
 
         <div className="info-card">
           <h3>📍 Head Office</h3>
-          <p style={{color:"white"}}>VajraBank Tower, BKC</p>
-          <p style={{color:"white"}}>Mumbai, Maharashtra 400051</p>
+          <p style={{color:"white"}}>KPHB colony, BKC</p>
+          <p style={{color:"white"}}>Hyderabad, Telangana 500001</p>
         </div>
 
         <div className="info-card">

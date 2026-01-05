@@ -34,14 +34,14 @@ export default function Footer() {
               <FaTwitter />
             </a>
             <a
-              href="https://www.instagram.com"
+              href="https://www.instagram.com/mahesh_nani_7364/"
               target="_blank"
               rel="noopener noreferrer"
             >
               <FaInstagram />
             </a>
             <a
-              href="https://www.linkedin.com"
+              href="https://www.linkedin.com/in/mahesh-kalvakuntla-49296424b/"
               target="_blank"
               rel="noopener noreferrer"
             >
@@ -75,7 +75,7 @@ export default function Footer() {
           <p style={{color:"white"}}>📞 1800-VAJRA-BANK</p>
           <span style={{color:"white"}}>24/7 Customer Support</span>
           <p style={{color:"white"}}>✉ support@vajrabank.com</p>
-          <p style={{color:"white"}}>📍 VajraBank Tower, BKC, Mumbai 400051</p>
+          <p style={{color:"white"}}>📍 VajraBank Tower, BKC, Hyderabad 50001</p>
         </div>
       </div>
 
