@@ -1,35 +1,49 @@
 import { useState, useRef, useEffect } from "react";
 import { NavLink, useNavigate } from "react-router-dom";
-import { Bell, BellFill, Check2All } from "react-bootstrap-icons";
+import { Bell, BellFill, Check2All, List, X, ChatSquareText } from "react-bootstrap-icons";
 import { collection, query, where, onSnapshot, orderBy, doc, updateDoc, limit } from "firebase/firestore";
 import { userDB } from "../firebaseUser";
+import { feedbackService } from "../services/feedbackService";
 import "../styles/AdminNavbar.css";
 
-export default function AdminNavbar({ admin, onLogout }) {
+export default function AdminNavbar({ admin, onLogout, onToggleSidebar, isSidebarOpen }) {
   const [isOpen, setIsOpen] = useState(false);
   const [showNotifications, setShowNotifications] = useState(false);
   const [notifications, setNotifications] = useState([]);
+  const [feedbackCount, setFeedbackCount] = useState(0);
   const dropdownRef = useRef(null);
   const notifRef = useRef(null);
   const navigate = useNavigate();
+
+  // Listen for Feedback Updates
+  useEffect(() => {
+    setFeedbackCount(feedbackService.getPendingCount());
+    const unsubscribe = feedbackService.subscribe(() => {
+      setFeedbackCount(feedbackService.getPendingCount());
+    });
+    return () => unsubscribe();
+  }, []);
 
   // Listen for Admin Notifications
   useEffect(() => {
     const q = query(
       collection(userDB, "notifications"),
       where("role", "==", "admin"),
-      where("read", "==", false),
-      orderBy("createdAt", "desc"),
-      limit(10)
+      where("read", "==", false)
     );
 
-    const unsubscribe = onSnapshot(q, (snapshot) => {
-      const notifs = [];
-      snapshot.forEach((doc) => {
-        notifs.push({ id: doc.id, ...doc.data() });
-      });
-      setNotifications(notifs);
-    });
+    const unsubscribe = onSnapshot(q,
+      (snapshot) => {
+        const notifs = snapshot.docs
+          .map(doc => ({ id: doc.id, ...doc.data() }))
+          .sort((a, b) => (b.createdAt?.toDate?.() || new Date(0)) - (a.createdAt?.toDate?.() || new Date(0)))
+          .slice(0, 10);
+        setNotifications(notifs);
+      },
+      (error) => {
+        console.error("Firestore Notification Listener Error:", error);
+      }
+    );
 
     return () => unsubscribe();
   }, []);
@@ -84,22 +98,41 @@ export default function AdminNavbar({ admin, onLogout }) {
 
   return (
     <nav className="admin-navbar">
-      {/* LEFT: Public Navigation */}
-      <div className="admin-nav-links">
-        {/* <NavLink to="/" className="admin-nav-link">
-          Home
-        </NavLink>
-        <NavLink to="/about" className="admin-nav-link">
-          About
-        </NavLink>
-        <NavLink to="/contact" className="admin-nav-link">
-          Contact
-        </NavLink> */}
-        <h1>Welcome to Admin panel👋</h1>
+      <div className="admin-nav-left">
+        <button
+          className="sidebar-toggle-btn"
+          onClick={onToggleSidebar}
+          aria-label="Toggle Sidebar"
+        >
+          {isSidebarOpen ? <X size={24} /> : <List size={24} />}
+        </button>
+        <div className="admin-nav-links">
+          <h1>Welcome, {admin?.name || "Admin"} 👋</h1>
+        </div>
       </div>
 
       {/* RIGHT: Notifications & Profile */}
       <div style={{ display: 'flex', alignItems: 'center', gap: '20px' }}>
+
+        {/* FEEDBACK NOTIFICATIONS (NEW) */}
+        <button
+          onClick={() => navigate('/admin/reports')}
+          title="User Feedback"
+          style={{ position: 'relative', background: 'none', border: 'none', color: '#64748b', cursor: 'pointer', fontSize: '20px', display: 'flex', alignItems: 'center' }}
+        >
+          <ChatSquareText />
+          {feedbackCount > 0 && (
+            <span style={{
+              position: 'absolute', top: '-5px', right: '-5px',
+              background: '#f59e0b', color: 'white', fontSize: '10px', fontWeight: 'bold',
+              borderRadius: '50%', width: '18px', height: '18px',
+              display: 'flex', alignItems: 'center', justifyContent: 'center',
+              boxShadow: '0 0 10px rgba(245, 158, 11, 0.5)'
+            }}>
+              {feedbackCount}
+            </span>
+          )}
+        </button>
 
         {/* NOTIFICATIONS */}
         <div className="admin-notif-wrapper" ref={notifRef}>

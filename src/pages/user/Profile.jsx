@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { useCurrentUser } from '../../hooks/useCurrentUser';
 import { Person, Envelope, Phone, GeoAlt, ShieldLock, CheckCircle, XCircle } from 'react-bootstrap-icons';
+import './Profile.css';
 
 export default function Profile() {
   const { currentUser, loading, updateUserProfile } = useCurrentUser();
@@ -39,43 +40,43 @@ export default function Profile() {
     setTimeout(() => setToast(null), 3000);
   };
 
-  if (loading || !currentUser) return <div>Loading...</div>;
+  if (loading || !currentUser) return <div className="p-10 text-center">Identifying Profile...</div>;
 
   return (
-    <div style={{ padding: '24px', maxWidth: '800px', margin: '0 auto', color: 'black', position: 'relative' }}>
+    <div className="profile-main">
 
       {/* TOAST NOTIFICATION */}
       {toast && (
-        <div style={{ position: 'fixed', top: '20px', right: '20px', background: toast.type === 'success' ? '#10b981' : '#64748b', color: 'white', padding: '12px 24px', borderRadius: '8px', zIndex: 1000, boxShadow: '0 4px 12px rgba(0,0,0,0.1)', animation: 'fadeUp 0.3s ease' }}>
+        <div className={`toast-p ${toast.type}`}>
           {toast.msg}
         </div>
       )}
 
-      <h1 style={{ marginBottom: '32px' }}>My Profile</h1>
+      <h1>My Profile</h1>
 
-      <div style={{ background: 'white', borderRadius: '16px', border: '1px solid #e2e8f0', overflow: 'hidden' }}>
+      <div className="profile-card">
 
         {/* PROFILE HEADER */}
-        <div style={{ padding: '32px', background: 'linear-gradient(to right, #f8fafc, #fff)', borderBottom: '1px solid #e2e8f0', display: 'flex', alignItems: 'center', gap: '24px' }}>
-          <div style={{ width: '80px', height: '80px', background: '#3b82f6', borderRadius: '50%', display: 'flex', alignItems: 'center', justifyContent: 'center', color: 'white', fontSize: '32px', fontWeight: 'bold' }}>
+        <div className="profile-banner">
+          <div className="avatar-large">
             {currentUser.firstName.charAt(0)}
           </div>
-          <div>
-            <h2 style={{ margin: 0, fontSize: '24px' }}>{currentUser.fullName}</h2>
-            <p style={{ margin: '4px 0 0 0', color: '#64748b' }}>Customer ID: {currentUser.customerId}</p>
+          <div className="profile-summary">
+            <h2>{currentUser.fullName}</h2>
+            <p className="customer-id">Customer ID: {currentUser.customerId}</p>
           </div>
 
-          <div style={{ marginLeft: 'auto' }}>
+          <div className="profile-actions">
             {!isEditing ? (
-              <button onClick={() => setIsEditing(true)} style={{ padding: '8px 16px', borderRadius: '8px', border: '1px solid #cbd5e1', background: 'white', cursor: 'pointer', color: '#334155', fontWeight: '500' }}>
+              <button onClick={() => setIsEditing(true)} className="edit-btn">
                 Edit Profile
               </button>
             ) : (
-              <div style={{ display: 'flex', gap: '8px' }}>
-                <button onClick={handleCancel} style={{ padding: '8px 16px', borderRadius: '8px', border: '1px solid #cbd5e1', background: 'white', cursor: 'pointer', color: '#64748b' }}>
+              <div style={{ display: 'flex', gap: '12px' }}>
+                <button onClick={handleCancel} className="cancel-btn">
                   Cancel
                 </button>
-                <button onClick={handleSave} style={{ padding: '8px 16px', borderRadius: '8px', border: 'none', background: '#3b82f6', cursor: 'pointer', color: 'white' }}>
+                <button onClick={handleSave} className="save-btn">
                   Save Changes
                 </button>
               </div>
@@ -84,10 +85,10 @@ export default function Profile() {
         </div>
 
         {/* DETAILS GRID */}
-        <div style={{ padding: '32px', display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '32px' }}>
+        <div className="profile-details-grid">
 
-          <div>
-            <label style={{ display: 'flex', alignItems: 'center', gap: '8px', marginBottom: '8px', color: '#64748b', fontSize: '14px', fontWeight: '500' }}>
+          <div className="profile-field">
+            <label className="field-label">
               <Envelope /> Email Address
             </label>
             {isEditing ? (
@@ -95,15 +96,15 @@ export default function Profile() {
                 type="email"
                 value={formData.email}
                 onChange={(e) => setFormData({ ...formData, email: e.target.value })}
-                style={{ width: '100%', padding: '8px 12px', borderRadius: '6px', border: '1px solid #3b82f6', outline: 'none' }}
+                className="field-input"
               />
             ) : (
-              <div style={{ fontSize: '16px', fontWeight: '500' }}>{currentUser.email}</div>
+              <div className="field-value">{currentUser.email}</div>
             )}
           </div>
 
-          <div>
-            <label style={{ display: 'flex', alignItems: 'center', gap: '8px', marginBottom: '8px', color: '#64748b', fontSize: '14px', fontWeight: '500' }}>
+          <div className="profile-field">
+            <label className="field-label">
               <Phone /> Phone Number
             </label>
             {isEditing ? (
@@ -111,15 +112,15 @@ export default function Profile() {
                 type="tel"
                 value={formData.phone}
                 onChange={(e) => setFormData({ ...formData, phone: e.target.value })}
-                style={{ width: '100%', padding: '8px 12px', borderRadius: '6px', border: '1px solid #3b82f6', outline: 'none' }}
+                className="field-input"
               />
             ) : (
-              <div style={{ fontSize: '16px', fontWeight: '500' }}>{currentUser.phone}</div>
+              <div className="field-value">{currentUser.phone}</div>
             )}
           </div>
 
-          <div style={{ gridColumn: 'span 2' }}>
-            <label style={{ display: 'flex', alignItems: 'center', gap: '8px', marginBottom: '8px', color: '#64748b', fontSize: '14px', fontWeight: '500' }}>
+          <div className="profile-field full-width">
+            <label className="field-label">
               <GeoAlt /> Residential Address
             </label>
             {isEditing ? (
@@ -127,25 +128,25 @@ export default function Profile() {
                 rows="2"
                 value={formData.address}
                 onChange={(e) => setFormData({ ...formData, address: e.target.value })}
-                style={{ width: '100%', padding: '8px 12px', borderRadius: '6px', border: '1px solid #3b82f6', outline: 'none' }}
+                className="field-input"
               />
             ) : (
-              <div style={{ fontSize: '16px', fontWeight: '500' }}>{currentUser.address}</div>
+              <div className="field-value">{currentUser.address}</div>
             )}
           </div>
 
-          <div>
-            <label style={{ display: 'flex', alignItems: 'center', gap: '8px', marginBottom: '8px', color: '#64748b', fontSize: '14px', fontWeight: '500' }}>
-              <ShieldLock /> Security Questions
+          <div className="profile-field">
+            <label className="field-label">
+              <ShieldLock /> Security Info <span className="readonly-hint">(Read-only)</span>
             </label>
-            <div style={{ fontSize: '16px', fontWeight: '500', color: '#64748b' }}>Set (3 questions) <span style={{ fontSize: '12px', fontStyle: 'italic' }}>(Read-only)</span></div>
+            <div className="field-value" style={{ color: '#64748b' }}>3 Questions Secured</div>
           </div>
 
-          <div>
-            <label style={{ display: 'flex', alignItems: 'center', gap: '8px', marginBottom: '8px', color: '#64748b', fontSize: '14px', fontWeight: '500' }}>
+          <div className="profile-field">
+            <label className="field-label">
               Last Login
             </label>
-            <div style={{ fontSize: '16px', fontWeight: '500' }}>{new Date().toLocaleDateString()}</div>
+            <div className="field-value">{new Date().toLocaleDateString()}</div>
           </div>
 
         </div>

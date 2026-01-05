@@ -2,11 +2,12 @@ import { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { useAuth } from "../context/AuthContext";
 
-import { signInWithEmailAndPassword, createUserWithEmailAndPassword } from "firebase/auth";
+import { signInWithEmailAndPassword, createUserWithEmailAndPassword, sendPasswordResetEmail } from "firebase/auth";
 import { doc, getDoc, setDoc, serverTimestamp, addDoc, collection } from "firebase/firestore";
 import { userAuth, userDB } from "../firebaseUser";
 
 import { FaEye, FaEyeSlash } from "react-icons/fa";
+import "./Login.css";
 
 export default function Login() {
   const navigate = useNavigate();
@@ -261,130 +262,130 @@ export default function Login() {
     return;
   };
 
-/* ================= FORGOT PASSWORD ================= */
-const handleForgotPassword = async () => {
-  if (!email) {
-    alert("Enter your email first");
-    return;
-  }
+  /* ================= FORGOT PASSWORD ================= */
+  const handleForgotPassword = async () => {
+    if (!email) {
+      alert("Enter your email first");
+      return;
+    }
 
-  try {
-    await sendPasswordResetEmail(auth, email);
-    alert("Password reset email sent");
-  } catch (err) {
-    alert(err.message);
-  }
-};
+    try {
+      await sendPasswordResetEmail(userAuth, email);
+      alert("Password reset email sent");
+    } catch (err) {
+      alert(err.message);
+    }
+  };
 
-return (
-  <div className="login-page">
-    <div className="login-card animate-container">
-      <h2 className="typing-text">
-        {typedText}
-        <span className="cursor">.</span>
-      </h2>
+  return (
+    <div className="login-page">
+      <div className="login-card animate-container">
+        <h2 className="typing-text">
+          {typedText}
+          <span className="cursor">.</span>
+        </h2>
 
-      <p className="subtitle">Sign in to access your dashboard</p>
+        <p className="subtitle">Sign in to access your dashboard</p>
 
-      {error && <p style={{ color: "salmon" }}>{error}</p>}
+        {error && <p style={{ color: "salmon" }}>{error}</p>}
 
-      <form onSubmit={handleSubmit}>
-        {/* ================= SIGNUP EXTRA ================= */}
-        {mode === "signup" && (
-          <>
-            <div className="profile-upload">
-              <label className="avatar-circle">
-                {image ? (
-                  <img src={image} alt="Profile" className="avatar-preview" />
-                ) : (
-                  <span>Upload</span>
-                )}
-                <input
-                  type="file"
-                  accept="image/*"
-                  hidden
-                  onChange={handleImageChange}
-                />
-              </label>
-            </div>
+        <form onSubmit={handleSubmit}>
+          {/* ================= SIGNUP EXTRA ================= */}
+          {mode === "signup" && (
+            <>
+              <div className="profile-upload">
+                <label className="avatar-circle">
+                  {image ? (
+                    <img src={image} alt="Profile" className="avatar-preview" />
+                  ) : (
+                    <span>Upload</span>
+                  )}
+                  <input
+                    type="file"
+                    accept="image/*"
+                    hidden
+                    onChange={handleImageChange}
+                  />
+                </label>
+              </div>
 
-            <input
-              type="text"
-              placeholder="First Name"
-              value={firstname}
-              onChange={(e) => setFirstname(e.target.value)}
-              required
-            />
+              <input
+                type="text"
+                placeholder="First Name"
+                value={firstname}
+                onChange={(e) => setFirstname(e.target.value)}
+                required
+              />
 
-            <input
-              type="tel"
-              placeholder="Mobile Number"
-              value={mobile}
-              onChange={(e) => setMobile(e.target.value)}
-              required
-            />
-          </>
-        )}
+              <input
+                type="tel"
+                placeholder="Mobile Number"
+                value={mobile}
+                onChange={(e) => setMobile(e.target.value)}
+                required
+              />
+            </>
+          )}
 
-        {/* EMAIL */}
-        <input
-          type="email"
-          placeholder="Email"
-          value={email}
-          onChange={(e) => setEmail(e.target.value)}
-          required
-        />
-
-        {/* PASSWORD */}
-        <div className="password-wrapper">
+          {/* EMAIL */}
           <input
-            type={showPassword ? "text" : "password"}
-            placeholder={mode === "signup" ? "Create Password" : "Password"}
-            value={password}
-            onChange={(e) => setPassword(e.target.value)}
+            type="email"
+            placeholder="Email"
+            value={email}
+            onChange={(e) => setEmail(e.target.value)}
             required
           />
 
-          <span
-            className="toggle-password"
-            onClick={() => setShowPassword(!showPassword)}
-          >
-            {showPassword ? <FaEyeSlash /> : <FaEye />}
-          </span>
-        </div>
+          {/* PASSWORD */}
+          <div className="password-wrapper">
+            <input
+              type={showPassword ? "text" : "password"}
+              placeholder={mode === "signup" ? "Create Password" : "Password"}
+              value={password}
+              onChange={(e) => setPassword(e.target.value)}
+              required
+            />
 
-        {mode === "user" && (
-          <p className="forgot-link" onClick={handleForgotPassword}>
-            Forgot password?
-          </p>
-        )}
+            <span
+              className="toggle-password"
+              onClick={() => setShowPassword(!showPassword)}
+            >
+              {showPassword ? <FaEyeSlash /> : <FaEye />}
+            </span>
+          </div>
 
-        <button type="submit" className="login-btn" disabled={submitting}>
-          {submitting
-            ? "Please wait..."
-            : mode === "signup"
-              ? "Create login"
-              : "Login"}
-        </button>
-      </form>
+          {mode === "user" && (
+            <p className="forgot-link" onClick={handleForgotPassword}>
+              Forgot password?
+            </p>
+          )}
 
-      <p className="signup-text">
-        {mode === "user" ? (
-          <>
-            New user? <span onClick={() => setMode("signup")}>Sign up</span>
-          </>
-        ) : (
-          <>
-            Already have an account?{" "}
-            <span onClick={() => setMode("user")}>Login</span>
-          </>
-        )}
-      </p>
+          <button type="submit" className="login-btn" disabled={submitting}>
+            {submitting
+              ? "Please wait..."
+              : mode === "signup"
+                ? "Create login"
+                : "Login"}
+          </button>
+        </form>
 
-      <p className="hint-a" onClick={() => navigate("/admin")}>
-        Admin Login →
-      </p>
+        <p className="signup-text">
+          {mode === "user" ? (
+            <>
+              New user? <span onClick={() => setMode("signup")}>Sign up</span>
+            </>
+          ) : (
+            <>
+              Already have an account?{" "}
+              <span onClick={() => setMode("user")}>Login</span>
+            </>
+          )}
+        </p>
+
+        <p className="hint-a" onClick={() => navigate("/admin")}>
+          Admin Login →
+        </p>
+      </div>
     </div>
-  </div>
-);
+  );
 }

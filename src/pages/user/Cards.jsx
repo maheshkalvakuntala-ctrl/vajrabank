@@ -1,279 +1,332 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useMemo } from 'react';
 import { useCurrentUser } from '../../hooks/useCurrentUser';
-import { Wifi, PlusCircle, CreditCard as CardIcon } from 'react-bootstrap-icons';
-import { collection, addDoc, query, where, onSnapshot, serverTimestamp } from 'firebase/firestore';
+import { collection, query, where, onSnapshot, orderBy, addDoc, serverTimestamp } from 'firebase/firestore';
 import { userDB } from '../../firebaseUser';
+import {
+  CreditCard as CardIcon,
+  PlusLg,
+  ArrowUpRight,
+  Wallet2,
+  ShieldCheck,
+  Lock,
+  ClockHistory,
+  PieChartFill,
+  CheckCircleFill,
+  XCircleFill,
+  InfoCircle,
+  HourglassSplit,
+  Check2Circle,
+  ChevronDown
+} from 'react-bootstrap-icons';
+import {
+  PieChart, Pie, Cell, ResponsiveContainer, Tooltip,
+} from 'recharts';
+import CardVisual from '../../components/user/CardVisual';
+import CardApplicationForm from '../../components/user/CardApplicationForm';
+import './Cards.css';
+
+const COLORS = ['#3b82f6', '#10b981', '#f59e0b', '#ef4444', '#8b5cf6', '#ec4899'];
 
 export default function Cards() {
-  const { currentUser, loading } = useCurrentUser();
-  const [isBlocked, setIsBlocked] = useState(false);
-  const [onlineEnabled, setOnlineEnabled] = useState(true);
+  const { currentUser } = useCurrentUser();
   const [applications, setApplications] = useState([]);
-  const [showApply, setShowApply] = useState(false);
-  const [formData, setFormData] = useState({ cardType: 'Gold Card', income: '' });
-  const [submitting, setSubmitting] = useState(false);
+  const [showForm, setShowForm] = useState(false);
+  const [loading, setLoading] = useState(true);
+  const [isBlocked, setIsBlocked] = useState(false);
 
-  // Load persistent card state & fetch applications
+  const hasCard = !!currentUser?.cardId;
+
   useEffect(() => {
-    if (!currentUser) return;
-
-    // LocalStorage for block/online (legacy simulation)
-    const cardState = localStorage.getItem(`cardState_${currentUser.customerId}`);
-    if (cardState) {
-      const { blocked, online } = JSON.parse(cardState);
-      setIsBlocked(blocked);
-      setOnlineEnabled(online);
-    }
-
-    // Firestore for Applications
+    if (!currentUser?.uid) return;
     const q = query(
       collection(userDB, 'creditCardApplications'),
       where('userId', '==', currentUser.uid)
     );
     const unsubscribe = onSnapshot(q, (snapshot) => {
-      const apps = [];
-      snapshot.forEach(doc => apps.push({ id: doc.id, ...doc.data() }));
-      apps.sort((a, b) => (b.createdAt?.seconds || 0) - (a.createdAt?.seconds || 0));
+      const apps = snapshot.docs
+        .map(doc => ({ id: doc.id, ...doc.data() }))
+        .sort((a, b) => (b.createdAt?.toDate?.() || new Date(0)) - (a.createdAt?.toDate?.() || new Date(0)));
       setApplications(apps);
+      setLoading(false);
     });
-
     return () => unsubscribe();
   }, [currentUser]);
 
-  const handleApply = async (e) => {
-    e.preventDefault();
-    if (!formData.income) return;
+  const analytics = useMemo(() => {
+    if (!currentUser?.cardTransactions) return null;
+    const categories = {};
+    currentUser.cardTransactions.forEach(tx => {
+      const cat = mapTransactionCategory(tx.reason);
+      categories[cat] = (categories[cat] || 0) + tx.amount;
+    });
+    return {
+      pieData: Object.entries(categories).map(([name, value]) => ({ name, value }))
+    };
+  }, [currentUser]);
 
-    setSubmitting(true);
+  const handleApply = async (data) => {
     try {
-      // 1. Create Application
       await addDoc(collection(userDB, 'creditCardApplications'), {
         userId: currentUser.uid,
         userEmail: currentUser.email,
-        userName: currentUser.displayName,
-        cardType: formData.cardType,
-        income: Number(formData.income),
+        userName: currentUser.fullName,
+        ...data,
         status: 'pending',
         createdAt: serverTimestamp()
       });
-
-      // 2. Notify Admin
-      await addDoc(collection(userDB, 'notifications'), {
-        role: 'admin',
-        type: 'creditCard',
-        message: `New credit card application from ${currentUser.email}`,
-        userId: currentUser.uid,
-        read: false,
-        redirectTo: '/admin/cards',
-        createdAt: serverTimestamp()
-      });
-
-      alert("Credit card application submitted!");
-      setShowApply(false);
-      setFormData({ cardType: 'Gold Card', income: '' });
+      setShowForm(false);
     } catch (err) {
       console.error(err);
-      alert("Error submitting application");
-    } finally {
-      setSubmitting(false);
+      alert("Application failed. Please try again.");
     }
   };
 
-  const updateCardState = (newBlocked, newOnline) => {
-    setIsBlocked(newBlocked);
-    setOnlineEnabled(newOnline);
-    localStorage.setItem(`cardState_${currentUser.customerId}`, JSON.stringify({ blocked: newBlocked, online: newOnline }));
+  const mapTransactionCategory = (reason) => {
+    const r = reason.toLowerCase();
+    if (r.includes('amazon') || r.includes('flipkart') || r.includes('shopping')) return 'Shopping';
+    if (r.includes('swiggy') || r.includes('zomato') || r.includes('restaurant') || r.includes('food')) return 'Food';
+    if (r.includes('uber') || r.includes('ola') || r.includes('fuel') || r.includes('travel')) return 'Travel';
+    if (r.includes('netflix') || r.includes('prime') || r.includes('movies')) return 'Entertainment';
+    if (r.includes('bill') || r.includes('recharge') || r.includes('electricity')) return 'Bills';
+    return 'Others';
   };
 
-  if (loading || !currentUser) return <div style={{ padding: '40px', textAlign: 'center' }}>Loading Card Data...</div>;
+  const CustomTooltip = ({ active, payload }) => {
+    if (active && payload && payload.length) {
+      return (
+        <div className="custom-tooltip" style={{ background: 'white', padding: '10px', borderRadius: '8px', boxShadow: '0 4px 6px rgba(0,0,0,0.1)', border: '1px solid #e2e8f0' }}>
+          <p className="label" style={{ fontWeight: '700', color: '#1e293b' }}>{`${payload[0].name}: ₹${payload[0].value.toLocaleString()}`}</p>
+        </div>
+      );
+    }
+    return null;
+  };
+
+  if (loading) return <div className="p-10 text-center text-slate-500">Syncing with secure vault...</div>;
 
   return (
-    <div style={{ padding: '24px', color: 'black', maxWidth: '1000px', margin: '0 auto' }}>
-      <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '8px' }}>
-        <h1>My Cards</h1>
-        <button
-          onClick={() => setShowApply(!showApply)}
-          style={{
-            background: '#3b82f6', color: 'white', border: 'none', padding: '10px 20px',
-            borderRadius: '8px', cursor: 'pointer', display: 'flex', alignItems: 'center', gap: '8px',
-            fontWeight: '600', boxShadow: '0 4px 6px -1px rgba(59, 130, 246, 0.5)'
-          }}
-        >
-          <PlusCircle /> Apply for Card
-        </button>
+    <main className="cards-main">
+      {/* HEADER */}
+      <div className="cards-header">
+        <h1>
+          <CardIcon /> Credit Portfolios
+        </h1>
+        <p>Analyze, manage and apply for your credit products.</p>
       </div>
-      <p style={{ color: '#64748b', marginBottom: '32px' }}>Manage your debit and credit cards.</p>
 
-      {/* APPLY FORM MODAL-ISH */}
-      {showApply && (
-        <div style={{ background: '#f8fafc', border: '1px solid #e2e8f0', borderRadius: '16px', padding: '24px', marginBottom: '32px' }}>
-          <h3 style={{ marginBottom: '20px' }}>New Card Application</h3>
-          <form onSubmit={handleApply} style={{ display: 'grid', gridTemplateColumns: '1fr 1fr 1fr', gap: '20px', alignItems: 'flex-end' }}>
+      {!hasCard ? (
+        showForm ? (
+          <CardApplicationForm
+            user={currentUser}
+            onSubmit={handleApply}
+            onCancel={() => setShowForm(false)}
+          />
+        ) : (
+          <>
+            {applications.length > 0 && applications[0].status === 'pending' ? (
+              <PendingState app={applications[0]} />
+            ) : (
+              <EmptyState onApply={() => setShowForm(true)} />
+            )}
+          </>
+        )
+      ) : (
+        <div className="cards-view-wrapper">
+          {/* WELCOME BANNER */}
+          <div className="welcome-banner">
             <div>
-              <label style={{ display: 'block', marginBottom: '8px', fontSize: '14px', fontWeight: '500' }}>Card Type</label>
-              <select
-                value={formData.cardType}
-                onChange={(e) => setFormData({ ...formData, cardType: e.target.value })}
-                style={{ width: '100%', padding: '10px', borderRadius: '8px', border: '1px solid #cbd5e1' }}
-              >
-                <option>Platinum Card</option>
-                <option>Gold Card</option>
-                <option>Student Card</option>
-                <option>Business Card</option>
-              </select>
+              <h2>🎊 Welcome to VajraBank Credit Cards</h2>
+              <p>Spend Smart, Pay Smart! Your {currentUser.cardType} is now active.</p>
             </div>
-            <div>
-              <label style={{ display: 'block', marginBottom: '8px', fontSize: '14px', fontWeight: '500' }}>Monthly Income (₹)</label>
-              <input
-                type="number"
-                placeholder="e.g. 50000"
-                value={formData.income}
-                onChange={(e) => setFormData({ ...formData, income: e.target.value })}
-                style={{ width: '100%', padding: '10px', borderRadius: '8px', border: '1px solid #cbd5e1' }}
-                required
+            <div className="banner-emoji">🚀</div>
+          </div>
+
+          <div className="cards-main-grid">
+            {/* LEFT COLUMN: VISUAL & QUICK ACTIONS */}
+            <section className="cards-left-col">
+              <CardVisual
+                type={currentUser.cardType || 'Vajra Classic'}
+                number={currentUser.cardId}
+                holder={currentUser.fullName}
+                expiry="12/28"
+                blocked={isBlocked}
               />
-            </div>
-            <div style={{ display: 'flex', gap: '10px' }}>
-              <button type="submit" disabled={submitting} style={{ flex: 1, background: '#10b981', color: 'white', border: 'none', padding: '10px', borderRadius: '8px', fontWeight: '600', cursor: 'pointer' }}>
-                {submitting ? 'Sending...' : 'Submit'}
-              </button>
-              <button type="button" onClick={() => setShowApply(false)} style={{ flex: 1, background: '#ef4444', color: 'white', border: 'none', padding: '10px', borderRadius: '8px', fontWeight: '600', cursor: 'pointer' }}>
-                Cancel
-              </button>
-            </div>
-          </form>
-        </div>
-      )}
 
-      {/* APPLICATIONS STATUS */}
-      {applications.length > 0 && (
-        <div style={{ marginBottom: '40px' }}>
-          <h3 style={{ marginBottom: '16px' }}>Application Status</h3>
-          <div style={{ display: 'grid', gap: '12px' }}>
-            {applications.map(app => (
-              <div key={app.id} style={{ background: 'white', border: '1px solid #e2e8f0', padding: '16px', borderRadius: '12px', display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
-                <div style={{ display: 'flex', alignItems: 'center', gap: '12px' }}>
-                  <CardIcon size={20} style={{ color: '#3b82f6' }} />
-                  <div>
-                    <strong style={{ fontSize: '15px' }}>{app.cardType}</strong>
-                    <div style={{ fontSize: '13px', color: '#64748b' }}>
-                      Status: <span style={{
-                        color: app.status === 'approved' ? '#10b981' : app.status === 'rejected' ? '#ef4444' : '#f59e0b',
-                        fontWeight: '600', textTransform: 'uppercase'
-                      }}>{app.status}</span>
-                    </div>
+              {/* UTILS RING CARD */}
+              <div className="glass-card utilization-card">
+                <div className="util-ring-wrapper">
+                  <svg width="100" height="100" viewBox="0 0 100 100">
+                    <circle cx="50" cy="50" r="40" fill="none" stroke="#f1f5f9" strokeWidth="8" />
+                    <circle
+                      cx="50" cy="50" r="40" fill="none" stroke={currentUser.creditUtilization > 0.7 ? "#ef4444" : "#3b82f6"}
+                      strokeWidth="8" strokeDasharray={`${(currentUser.creditUtilization || 0) * 251.2} 251.2`}
+                      strokeLinecap="round" transform="rotate(-90 50 50)"
+                      style={{ transition: 'stroke-dasharray 1s ease-out' }}
+                    />
+                  </svg>
+                  <div className="util-ring-text">
+                    <span className="util-percentage">{Math.round((currentUser.creditUtilization || 0) * 100)}%</span>
                   </div>
                 </div>
-                {app.status === 'approved' && (
-                  <div style={{ textAlign: 'right' }}>
-                    <span style={{ fontSize: '13px', color: '#10b981', fontWeight: '500' }}>
-                      📦 Delivery in {app.expectedDeliveryDays} days
-                    </span>
-                  </div>
-                )}
-                {app.status === 'rejected' && (
-                  <div style={{ textAlign: 'right', fontSize: '13px', color: '#ef4444' }}>
-                    Reason: {app.rejectionReason}
-                  </div>
-                )}
+                <div className="util-info">
+                  <h4 className="util-label">Credit Utilization</h4>
+                  <div className="util-amount">₹{(currentUser.creditBalance || 0).toLocaleString()}</div>
+                  <p className="util-hint">
+                    <CheckCircleFill className="text-emerald-500" /> Available Limit: ₹{((currentUser.creditLimit || 0) - (currentUser.creditBalance || 0)).toLocaleString()}
+                  </p>
+                </div>
               </div>
-            ))}
+
+              {/* INFORMATION HUB */}
+              <div className="card-hub-section">
+                <h3 className="section-title">Card Features & Hub</h3>
+                <CardAccordion
+                  title="Card Benefits & Rewards"
+                  icon={<Check2Circle />}
+                  content={
+                    <ul className="accordion-list">
+                      <li><strong>Cashback:</strong> Up to 5% on all online spends.</li>
+                      <li><strong>Lounge Access:</strong> {currentUser.cardType === 'Vajra Platinum' ? 'Unlimited International & Domestic.' : '2 Domestic visits per quarter.'}</li>
+                      <li><strong>Rewards:</strong> 4X points on every ₹100 spent.</li>
+                    </ul>
+                  }
+                />
+                <CardAccordion
+                  title="Usage Rules & Safety"
+                  icon={<ShieldCheck />}
+                  content={
+                    <ul className="accordion-list">
+                      <li><strong>Billing:</strong> Statement generated on 15th of month.</li>
+                      <li><strong>Utilization:</strong> Keep under 30% for score benefits.</li>
+                    </ul>
+                  }
+                />
+              </div>
+
+              {/* QUICK ACTIONS */}
+              <div className="card-quick-actions">
+                <button
+                  className="nav-btn-action"
+                  onClick={() => setIsBlocked(!isBlocked)}
+                  style={{ background: isBlocked ? '#10b981' : '#ef4444' }}
+                >
+                  {isBlocked ? <ShieldCheck /> : <Lock />} {isBlocked ? 'Unblock' : 'Block Card'}
+                </button>
+                {/* <button className="nav-btn-action secure-btn">
+                  <ArrowUpRight /> Pay Dues
+                </button> */}
+              </div>
+
+              {/* BILLING INFO */}
+              <div className="glass-card billing-card">
+                <h4 className="billing-title">
+                  <ClockHistory /> Upcoming Statement
+                </h4>
+                <div className="billing-row">
+                  <span className="billing-label">Minimum Due</span>
+                  <span className="billing-value">₹{currentUser.minPaymentDue?.toLocaleString()}</span>
+                </div>
+                <div className="billing-row">
+                  <span className="billing-label">Due Date</span>
+                  <span className="billing-value danger">{currentUser.paymentDueDate || '25th Oct'}</span>
+                </div>
+              </div>
+            </section>
+
+            {/* RIGHT COLUMN: ANALYTICS & HISTORY */}
+            <section className="cards-right-col">
+              <div className="glass-card analytics-card">
+                <h4 className="analytics-title">
+                  <PieChartFill className="text-blue-500" /> Spending Distribution
+                </h4>
+                <div className="chart-container">
+                  <ResponsiveContainer width="100%" height="100%">
+                    <PieChart>
+                      <Pie
+                        data={analytics?.pieData}
+                        innerRadius={60}
+                        outerRadius={80}
+                        paddingAngle={5}
+                        dataKey="value"
+                        stroke="none"
+                      >
+                        {analytics?.pieData.map((entry, index) => (
+                          <Cell key={`cell-${index}`} fill={COLORS[index % COLORS.length]} />
+                        ))}
+                      </Pie>
+                      <Tooltip content={<CustomTooltip />} />
+                    </PieChart>
+                  </ResponsiveContainer>
+                </div>
+              </div>
+
+              <div className="glass-card transaction-history-card">
+                <div className="history-header">
+                  <h4>Recent Card Swipes</h4>
+                  <button className="see-all-btn">See All</button>
+                </div>
+                <div className="history-list">
+                  {(currentUser.cardTransactions || []).length === 0 ? (
+                    <div className="empty-history" style={{ padding: '24px', textAlign: 'center', color: '#94a3b8' }}>No transactions recorded.</div>
+                  ) : (
+                    currentUser.cardTransactions?.map((tx, idx) => (
+                      <div key={idx} className="history-item">
+                        <div className="history-item-info">
+                          <div className="history-item-icon">
+                            <Wallet2 />
+                          </div>
+                          <div className="history-item-details">
+                            <div className="tx-reason">{tx.reason}</div>
+                            <div className="tx-date">{tx.date}</div>
+                          </div>
+                        </div>
+                        <div className="tx-amount">- ₹{tx.amount.toLocaleString()}</div>
+                      </div>
+                    ))
+                  )}
+                </div>
+              </div>
+            </section>
           </div>
         </div>
       )}
-
-      <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(350px, 1fr))', gap: '40px' }}>
-
-        {/* CARD VISUAL */}
-        <div>
-          <div style={{
-            background: isBlocked
-              ? 'linear-gradient(135deg, #334155, #1e293b)'
-              : 'linear-gradient(135deg, #0f172a, #334155)',
-            borderRadius: '20px',
-            padding: '32px',
-            color: 'white',
-            boxShadow: '0 20px 40px rgba(0,0,0,0.2)',
-            aspectRatio: '1.6',
-            position: 'relative',
-            overflow: 'hidden',
-            opacity: isBlocked ? 0.7 : 1,
-            filter: isBlocked ? 'grayscale(1)' : 'none',
-            transition: 'all 0.3s ease'
-          }}>
-            <div style={{ position: 'absolute', top: '-20%', right: '-20%', width: '300px', height: '300px', background: 'rgba(255,255,255,0.05)', borderRadius: '50%' }}></div>
-
-            <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', marginBottom: '40px' }}>
-              <img src="https://img.icons8.com/color/48/000000/chip-card.png" alt="Chip" style={{ width: '48px', opacity: 0.9 }} />
-              <Wifi size={28} />
-            </div>
-
-            <h3 style={{ fontFamily: 'monospace', fontSize: '28px', letterSpacing: '2px', textShadow: '0 2px 4px rgba(0,0,0,0.3)' }}>
-              **** **** **** {currentUser.customerId.slice(-4)}
-            </h3>
-
-            <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-end', marginTop: '32px' }}>
-              <div>
-                <p style={{ fontSize: '12px', opacity: 0.7, margin: 0, textTransform: 'uppercase' }}>{currentUser.raw['Card Type'] || 'Debit'} Card</p>
-                <p style={{ fontSize: '18px', fontWeight: '600', margin: '4px 0 0 0', textTransform: 'uppercase' }}>{currentUser.fullName}</p>
-              </div>
-              <div>
-                <p style={{ fontSize: '12px', opacity: 0.7, margin: 0 }}>EXP</p>
-                <p style={{ fontSize: '16px', fontWeight: '600', margin: '4px 0 0 0' }}>12/29</p>
-              </div>
-              <img src="https://img.icons8.com/color/48/000000/visa.png" alt="Visa" style={{ height: '40px' }} />
-            </div>
-
-            {isBlocked && (
-              <div style={{ position: 'absolute', top: '50%', left: '50%', transform: 'translate(-50%, -50%)', border: '2px solid white', padding: '10px 20px', borderRadius: '8px', fontWeight: 'bold', fontSize: '24px', letterSpacing: '2px' }}>
-                BLOCKED
-              </div>
-            )}
-          </div>
-        </div>
-
-        {/* CONTROLS */}
-        <div style={{ display: 'flex', flexDirection: 'column', gap: '16px' }}>
-
-          <div style={{ background: 'white', padding: '24px', borderRadius: '16px', border: '1px solid #e2e8f0', display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
-            <div>
-              <h3 style={{ margin: 0, fontSize: '18px' }}>Freeze Card</h3>
-              <p style={{ margin: '4px 0 0 0', color: '#64748b', fontSize: '14px' }}>Temporarily disable transactions</p>
-            </div>
-            <label className="switch">
-              <input type="checkbox" checked={isBlocked} onChange={(e) => updateCardState(e.target.checked, onlineEnabled)} />
-              <span className="slider round"></span>
-            </label>
-          </div>
-
-          <div style={{ background: 'white', padding: '24px', borderRadius: '16px', border: '1px solid #e2e8f0', display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
-            <div>
-              <h3 style={{ margin: 0, fontSize: '18px' }}>Online Transactions</h3>
-              <p style={{ margin: '4px 0 0 0', color: '#64748b', fontSize: '14px' }}>Enable/Disable E-commerce</p>
-            </div>
-            <label className="switch">
-              <input type="checkbox" checked={onlineEnabled} onChange={(e) => updateCardState(isBlocked, e.target.checked)} disabled={isBlocked} />
-              <span className="slider round"></span>
-            </label>
-          </div>
-
-          <div style={{ background: 'white', padding: '24px', borderRadius: '16px', border: '1px solid #e2e8f0' }}>
-            <div style={{ display: 'flex', justifyContent: 'space-between', marginBottom: '8px' }}>
-              <strong>Usage & Utilization</strong>
-              <strong>{(currentUser.raw['Credit Utilization'] * 100).toFixed(1)}% Limit Used</strong>
-            </div>
-            <div style={{ height: '8px', background: '#f1f5f9', borderRadius: '4px', overflow: 'hidden' }}>
-              <div style={{
-                width: `${Math.min(100, currentUser.raw['Credit Utilization'] * 100)}%`,
-                height: '100%',
-                background: currentUser.raw['Credit Utilization'] > 0.7 ? '#ef4444' : '#3b82f6'
-              }}></div >
-            </div>
-          </div>
-
-        </div>
-
-      </div>
-    </div>
+    </main>
   );
 }
+
+const EmptyState = ({ onApply }) => (
+  <div className="glass-card" style={{ padding: '80px 40px', textAlign: 'center', maxWidth: '600px', margin: '40px auto' }}>
+    <div style={{ width: '80px', height: '80px', background: '#dbeafe', borderRadius: '24px', display: 'flex', alignItems: 'center', justifyContent: 'center', margin: '0 auto 24px' }}>
+      <CardIcon size={40} className="text-blue-600" />
+    </div>
+    <h2 style={{ fontSize: '24px', fontWeight: '800', color: '#0f172a', marginBottom: '12px' }}>Unlock Premium Benefits</h2>
+    <p style={{ color: '#64748b', marginBottom: '32px' }}>Elevate your lifestyle with Vajra Credit Cards.</p>
+    <button onClick={onApply} style={{ background: '#3b82f6', color: 'white', border: 'none', padding: '16px 40px', borderRadius: '12px', fontWeight: '700', cursor: 'pointer', fontSize: '16px', boxShadow: '0 4px 6px rgba(59, 130, 246, 0.2)' }}>Start Application</button>
+  </div>
+);
+
+const PendingState = ({ app }) => (
+  <div className="glass-card" style={{ padding: '60px 40px', textAlign: 'center', maxWidth: '600px', margin: '40px auto' }}>
+    <div style={{ width: '80px', height: '80px', background: '#fef3c7', color: '#f59e0b', borderRadius: '24px', display: 'flex', alignItems: 'center', justifyContent: 'center', margin: '0 auto 24px' }}>
+      <HourglassSplit size={40} className="animate-spin-slow" />
+    </div>
+    <h2 style={{ fontSize: '24px', fontWeight: '800', marginBottom: '12px', color: '#0f172a' }}>Review in Progress</h2>
+    <p style={{ color: '#64748b' }}>Your application for {app.cardType} is being vetted.</p>
+    <style>{` .animate-spin-slow { animation: spin 3s linear infinite; } @keyframes spin { from { transform: rotate(0deg); } to { transform: rotate(360deg); } } `}</style>
+  </div>
+);
+
+const CardAccordion = ({ title, icon, content }) => {
+  const [isOpen, setIsOpen] = useState(false);
+  return (
+    <div className="glass-card feature-accordion">
+      <button onClick={() => setIsOpen(!isOpen)} className="accordion-trigger">
+        <div className="accordion-label">
+          {icon} <span>{title}</span>
+        </div>
+        <ChevronDown className="accordion-chevron" style={{ transform: isOpen ? 'rotate(180deg)' : 'rotate(0)' }} />
+      </button>
+      {isOpen && <div className="accordion-content">{content}</div>}
+    </div>
+  );
+};

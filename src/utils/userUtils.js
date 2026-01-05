@@ -55,6 +55,22 @@ export const normalizeLegacyUser = (rows) => {
         transactions: transactions.reverse(), // Show latest first
         loans: loans,
         address: profile["Address"],
-        age: profile["Age"]
+        age: profile["Age"],
+        // Credit Card specific fields
+        cardId: profile["CardID"] !== "N/A" ? profile["CardID"] : null,
+        cardType: profile["Card Type"] !== "N/A" ? profile["Card Type"] : null,
+        creditLimit: Number(profile["Credit Limit"]) || 0,
+        creditBalance: Number(profile["Credit Card Balance"]) || 0,
+        minPaymentDue: Number(profile["Minimum Payment Due"]) || 0,
+        paymentDueDate: profile["Payment Due Date"],
+        creditUtilization: Number(profile["Credit Utilization"]) || 0,
+        rewardPoints: Number(profile["Rewards Points"]) || 0,
+        cardTransactions: rows.filter(r => r["Transaction_Reason"] !== "N/A").map((r, i) => ({
+            id: `card-tx-${i}`,
+            date: r["Transaction Date"],
+            reason: r["Transaction_Reason"],
+            amount: Number(r["Transaction Amount"]),
+            category: r["Transaction_Reason"] // Will be mapped in UI
+        }))
     };
 };

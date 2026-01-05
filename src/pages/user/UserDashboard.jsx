@@ -39,146 +39,123 @@ export default function UserDashboard() {
       )}
 
       {/* HEADER */}
-      <div style={{ marginBottom: '32px' }}>
-        <h1 style={{ color: '#0f172a', fontWeight: '700', margin: 0 }}>
-          Hello, {currentUser.firstName} <span style={{ fontSize: '24px' }}>👋</span>
+      <div className="dashboard-header">
+        <h1>
+          Hello, {currentUser.firstName} <span>👋</span>
         </h1>
-        <p style={{ color: '#64748b', fontSize: '16px' }}>Here is your financial overview.</p>
+        <p>Here is your financial overview.</p>
       </div>
 
       {/* ROW 1: STATS */}
-      <div className="stats-grid" style={{ gridTemplateColumns: 'repeat(auto-fit, minmax(240px, 1fr))' }}>
+      <div className="stats-grid">
 
         {/* BALANCE CARD */}
-        <div className="stat-card primary" style={{ background: 'linear-gradient(135deg, #1e40af, #3b82f6)', color: 'white' }}>
-          <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start' }}>
+        <div className="stat-card balance-card">
+          <div className="stat-card-header">
             <div>
-              <p style={{ color: '#dbeafe', margin: 0, fontSize: '14px' }}>Total Balance</p>
-              <h2 style={{ margin: '8px 0', fontSize: '32px' }}>₹{currentUser.balance.toLocaleString()}</h2>
+              <p className="stat-label">Total Balance</p>
+              <h2 className="stat-value">₹{currentUser.balance.toLocaleString()}</h2>
             </div>
-            <Wallet size={24} style={{ opacity: 0.8 }} />
+            <Wallet size={24} className="stat-icon" />
           </div>
-          <div style={{ background: 'rgba(255,255,255,0.1)', padding: '4px 8px', borderRadius: '4px', display: 'inline-block', fontSize: '12px' }}>
+          <div className="account-preview">
             **** **** 8892
           </div>
         </div>
 
         {/* GROWTH CARD */}
-        <div className="stat-card">
-          <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start' }}>
+        <div className="stat-card growth-card">
+          <div className="stat-card-header">
             <div>
-              <p style={{ color: '#64748b', margin: 0, fontSize: '14px' }}>Monthly Interest</p>
-              <h3 style={{ margin: '8px 0', color: '#10b981' }}>+₹{Math.round(currentUser.balance * 0.004).toLocaleString()}</h3>
+              <p className="stat-label">Monthly Interest</p>
+              <h3 className="stat-value growth">+₹{Math.round(currentUser.balance * 0.004).toLocaleString()}</h3>
             </div>
-            <div style={{ background: '#dcfce7', padding: '8px', borderRadius: '50%', color: '#166534' }}>
+            <div className="icon-circle growth">
               <GraphUpArrow />
             </div>
           </div>
-          <p style={{ fontSize: '12px', color: '#64748b', margin: 0 }}>Projected based on current balance</p>
+          <p className="stat-hint">Projected based on current balance</p>
         </div>
 
         {/* ACCOUNT STATUS */}
-        <div className="stat-card" style={{ borderLeft: `4px solid ${currentUser.accountStatus === 'Active' ? '#10b981' : '#ef4444'}` }}>
-          <p style={{ color: '#64748b', margin: 0, fontSize: '14px' }}>Account Status</p>
-          <h3 style={{ margin: '8px 0', color: '#0f172a' }}>{currentUser.accountStatus}</h3>
-          <span style={{
-            fontSize: '12px',
-            padding: '2px 8px',
-            borderRadius: '12px',
-            background: currentUser.accountStatus === 'Active' ? '#dcfce7' : '#fee2e2',
-            color: currentUser.accountStatus === 'Active' ? '#166534' : '#991b1b'
-          }}>
+        <div className={`stat-card status-card ${currentUser.accountStatus === 'Active' ? 'active' : 'inactive'}`}>
+          <p className="stat-label">Account Status</p>
+          <h3 className="stat-value">{currentUser.accountStatus}</h3>
+          <span className={`status-badge ${currentUser.accountStatus === 'Active' ? 'success' : 'danger'}`}>
             {currentUser.accountStatus === 'Active' ? 'Fully Operational' : 'Action Required'}
           </span>
         </div>
 
         {/* KYC STATUS */}
-        <div className="stat-card">
-          <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start' }}>
+        <div className="stat-card kyc-card">
+          <div className="stat-card-header">
             <div>
-              <p style={{ color: '#64748b', margin: 0, fontSize: '14px' }}>KYC Status</p>
-              <h3 style={{ margin: '8px 0', color: '#0f172a' }}>{currentUser.kycStatus}</h3>
+              <p className="stat-label">KYC Status</p>
+              <h3 className="stat-value">{currentUser.kycStatus}</h3>
             </div>
-            <div style={{ background: '#e0f2fe', padding: '8px', borderRadius: '50%', color: '#0369a1' }}>
+            <div className="icon-circle kyc">
               <ShieldCheck />
             </div>
           </div>
-          <p style={{ fontSize: '12px', color: '#64748b', margin: 0 }}>Identity Verification</p>
+          <p className="stat-hint">Identity Verification</p>
         </div>
 
       </div>
 
       {/* ROW 2: ACTIONS & TRANSACTIONS */}
-      <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(300px, 1fr))', gap: '24px', marginTop: '32px' }}>
+      <div className="dashboard-main-grid">
 
         {/* LEFT COL: ACTIONS & INFO */}
-        <div style={{ display: 'flex', flexDirection: 'column', gap: '24px' }}>
-
-          {/* QUICK ACTIONS */}
-          {/* <div className="quick-actions" style={{ padding: '0' }}>
-            <h3 style={{ fontSize: '18px', color: '#334155', marginBottom: '16px' }}>Quick Actions</h3>
-            <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '12px' }}>
-              <button onClick={() => setShowModal('transfer')} className="btn" style={{ background: '#3b82f6', color: 'white', border: 'none', justifyContent: 'center', cursor: 'pointer' }}>
-                <ArrowUpRight /> Send Money
-              </button>
-              <button onClick={() => handleAction('ACCOUNT_REQ')} className="btn" style={{ background: 'white', border: '1px solid #e2e8f0', color: '#334155', justifyContent: 'center', cursor: 'pointer' }}>
-                <Plus /> Add Account
-              </button>
-              <button onClick={() => showToast("Statement downloaded (Mock PDF)", "success")} className="btn" style={{ background: 'white', border: '1px solid #e2e8f0', color: '#334155', justifyContent: 'center', cursor: 'pointer' }}>
-                <Download /> Statement
-              </button>
-              <button className="btn" style={{ background: 'white', border: '1px solid #e2e8f0', color: '#334155', justifyContent: 'center', cursor: 'not-allowed' }}>
-                ⋯ More
-              </button>
-            </div>
-          </div> */}
+        <div className="dashboard-left-col">
 
           {/* ACCOUNT DETAILS */}
-          <div className="info-card" style={{ padding: '24px' }}>
-            <h3 style={{ fontSize: '18px', color: '#334155', marginBottom: '16px' }}>Account Details</h3>
-            <div style={{ display: 'flex', justifyContent: 'space-between', padding: '12px 0', borderBottom: '1px solid #f1f5f9' }}>
-              <span style={{ color: '#64748b' }}>Account Number</span>
-              <span style={{ fontWeight: '600' }}>{currentUser.customerId}00892</span>
-            </div>
-            <div style={{ display: 'flex', justifyContent: 'space-between', padding: '12px 0', borderBottom: '1px solid #f1f5f9' }}>
-              <span style={{ color: '#64748b' }}>Account Type</span>
-              <span style={{ fontWeight: '600' }}>{currentUser.accountType}</span>
-            </div>
-            <div style={{ display: 'flex', justifyContent: 'space-between', padding: '12px 0' }}>
-              <span style={{ color: '#64748b' }}>Branch</span>
-              <span style={{ fontWeight: '600' }}>Main Street (IFSC: VJRA001)</span>
+          <div className="info-card">
+            <div className="card-header">Account Details</div>
+            <div className="card-body">
+              <div className="info-row">
+                <span className="info-label">Account Number</span>
+                <span className="info-value">{currentUser.customerId}00892</span>
+              </div>
+              <div className="info-row">
+                <span className="info-label">Account Type</span>
+                <span className="info-value">{currentUser.accountType}</span>
+              </div>
+              <div className="info-row">
+                <span className="info-label">Branch</span>
+                <span className="info-value">Main Street (IFSC: VJRA001)</span>
+              </div>
             </div>
           </div>
 
         </div>
 
         {/* RIGHT COL: RECENT TRANSACTIONS */}
-        <div className="info-card" style={{ padding: '0', overflow: 'hidden' }}>
-          <div style={{ padding: '24px', borderBottom: '1px solid #f1f5f9', display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
-            <h3 style={{ margin: 0, fontSize: '18px', color: '#334155' }}>Recent Transactions</h3>
-            <NavLink to="/user/transactions" style={{ fontSize: '12px', color: '#3b82f6', cursor: 'pointer', textDecoration: 'none' }}>View All</NavLink>
+        <div className="info-card">
+          <div className="card-header">
+            <span>Recent Transactions</span>
+            <NavLink to="/user/transactions" className="view-all-link">View All</NavLink>
           </div>
 
-          <div>
+          <div className="transaction-list">
             {currentUser.transactions && currentUser.transactions.length > 0 ? (
               currentUser.transactions.slice(0, 5).map((txn, i) => (
-                <div key={i} className="transaction-item" style={{ padding: '16px 24px', cursor: 'pointer', display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
-                  <div style={{ display: 'flex', alignItems: 'center', gap: '16px' }}>
-                    <div style={{ width: '40px', height: '40px', borderRadius: '50%', background: txn.type === 'Deposit' ? '#f0fdf4' : '#fef2f2', display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: '18px' }}>
+                <div key={i} className="transaction-item">
+                  <div className="transaction-info">
+                    <div className={`transaction-icon ${txn.type === 'Deposit' ? 'credit' : 'debit'}`}>
                       {txn.type === 'Deposit' ? '↓' : '↑'}
                     </div>
                     <div>
-                      <strong style={{ display: 'block', color: '#0f172a' }}>{txn.reason || (txn.type === 'Deposit' ? 'Deposit' : 'Withdrawal')}</strong>
-                      <small style={{ color: '#64748b' }}>{new Date(txn.date).toLocaleDateString()}</small>
+                      <strong className="transaction-reason">{txn.reason || (txn.type === 'Deposit' ? 'Deposit' : 'Withdrawal')}</strong>
+                      <small className="transaction-date">{new Date(txn.date).toLocaleDateString()}</small>
                     </div>
                   </div>
-                  <div style={{ fontWeight: '600', color: txn.type === 'Deposit' ? '#166534' : '#991b1b' }}>
+                  <div className={`transaction-amount ${txn.type === 'Deposit' ? 'credit' : 'debit'}`}>
                     {txn.type === 'Deposit' ? '+' : '-'}₹{txn.amount.toLocaleString()}
                   </div>
                 </div>
               ))
             ) : (
-              <div style={{ padding: '40px', textAlign: 'center', color: '#94a3b8' }}>No recent transactions found.</div>
+              <div className="empty-state">No recent transactions found.</div>
             )}
           </div>
         </div>

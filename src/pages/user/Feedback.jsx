@@ -1,36 +1,124 @@
-import React from 'react';
+import React, { useState } from 'react';
+import { useCurrentUser } from '../../hooks/useCurrentUser';
+import { feedbackService } from '../../services/feedbackService';
+import { ChatLeftQuote, Send, CheckCircle } from 'react-bootstrap-icons';
+import './Feedback.css';
 
 export default function Feedback() {
+  const { currentUser } = useCurrentUser();
+  const [subject, setSubject] = useState('');
+  const [message, setMessage] = useState('');
+  const [category, setCategory] = useState('General');
+  const [submitted, setSubmitted] = useState(false);
+  const [loading, setLoading] = useState(false);
+
+  const handleSubmit = (e) => {
+    e.preventDefault();
+    if (!subject || !message) return;
+
+    setLoading(true);
+
+    const ticket = {
+      userId: currentUser?.uid || 'guest',
+      userName: currentUser?.displayName || currentUser?.firstName || 'Guest User',
+      userEmail: currentUser?.email || 'N/A',
+      subject,
+      message,
+      category
+    };
+
+    // Simulate network delay for better UX
+    setTimeout(() => {
+      feedbackService.addTicket(ticket);
+      setLoading(false);
+      setSubmitted(true);
+      // Reset form
+      setSubject('');
+      setMessage('');
+      setCategory('General');
+    }, 800);
+  };
+
+  if (submitted) {
+    return (
+      <div className="feedback-container">
+        <div className="feedback-card success-state">
+          <div className="success-icon-wrapper">
+            <CheckCircle className="success-icon" />
+          </div>
+          <h2>Request Submitted!</h2>
+          <p>
+            Thank you for your feedback. Our support team has received your request
+            and will review it shortly. You can submit another request if needed.
+          </p>
+          <button
+            className="feedback-btn-primary"
+            onClick={() => setSubmitted(false)}
+          >
+            Submit New Request
+          </button>
+        </div>
+      </div>
+    );
+  }
+
   return (
-    <div style={{ padding: '24px', color: 'black', maxWidth: '600px', margin: '0 auto' }}>
-      <h1 style={{ marginBottom: '16px' }}>Help & Support</h1>
-      <p style={{ color: '#64748b', marginBottom: '32px' }}>Have a question or feedback? We're here to help.</p>
-
-      <div style={{ background: 'white', borderRadius: '16px', border: '1px solid #e2e8f0', padding: '32px' }}>
-
-        <div style={{ marginBottom: '20px' }}>
-          <label style={{ display: 'block', marginBottom: '8px', fontWeight: '500' }}>Subject</label>
-          <select style={{ width: '100%', padding: '12px', borderRadius: '8px', border: '1px solid #cbd5e1' }}>
-            <option>General Inquiry</option>
-            <option>Transaction Issue</option>
-            <option>Technical Support</option>
-            <option>Feedback</option>
-          </select>
-        </div>
-
-        <div style={{ marginBottom: '20px' }}>
-          <label style={{ display: 'block', marginBottom: '8px', fontWeight: '500' }}>Message</label>
-          <textarea rows="5" placeholder="Describe your issue or feedback..." style={{ width: '100%', padding: '12px', borderRadius: '8px', border: '1px solid #cbd5e1' }}></textarea>
-        </div>
-
-        <button style={{ width: '100%', background: '#0f172a', color: 'white', border: 'none', padding: '14px', borderRadius: '8px', fontSize: '16px', fontWeight: '600', cursor: 'pointer' }}>
-          Submit Request
-        </button>
-
+    <div className="feedback-container">
+      <div className="feedback-header">
+        <h1><ChatLeftQuote /> Help & Support</h1>
+        <p>Have a question or issue? We are here to help you 24/7.</p>
       </div>
 
-      <div style={{ marginTop: '32px', textAlign: 'center', color: '#64748b' }}>
-        <p>Or call us directly at <strong>1-800-VAJRA-HELP</strong></p>
+      <div className="feedback-card">
+        <form onSubmit={handleSubmit}>
+          <div className="form-group">
+            <label>Issue Category</label>
+            <select
+              value={category}
+              onChange={(e) => setCategory(e.target.value)}
+              className="feedback-input"
+            >
+              <option value="General">General Inquiry</option>
+              <option value="Technical">Technical Issue</option>
+              <option value="Billing">Billing & Payments</option>
+              <option value="Feature Request">Feature Request</option>
+            </select>
+          </div>
+
+          <div className="form-group">
+            <label>Subject</label>
+            <input
+              type="text"
+              value={subject}
+              onChange={(e) => setSubject(e.target.value)}
+              placeholder="Briefly describe the issue..."
+              className="feedback-input"
+              required
+            />
+          </div>
+
+          <div className="form-group">
+            <label>Message</label>
+            <textarea
+              rows="5"
+              value={message}
+              onChange={(e) => setMessage(e.target.value)}
+              placeholder="Tell us more about what you're experiencing..."
+              className="feedback-input"
+              required
+            ></textarea>
+          </div>
+
+          <div className="form-note">
+            <p>
+              Submitting as: <strong>{currentUser?.displayName || currentUser?.email || 'Guest'}</strong>
+            </p>
+          </div>
+
+          <button type="submit" className="feedback-btn-primary" disabled={loading}>
+            {loading ? 'Sending...' : <><Send /> Submit Request</>}
+          </button>
+        </form>
       </div>
     </div>
   );

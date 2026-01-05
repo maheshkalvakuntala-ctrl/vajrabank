@@ -1,11 +1,11 @@
 import { useState, useRef, useEffect } from "react";
 import { NavLink, useNavigate } from "react-router-dom";
-import { Bell, BellFill, Check2All } from "react-bootstrap-icons";
+import { Bell, BellFill, Check2All, List, X } from "react-bootstrap-icons";
 import { collection, query, where, onSnapshot, orderBy, doc, updateDoc, limit } from "firebase/firestore";
 import { userDB } from "../firebaseUser";
 import "../styles/UserNavbar.css";
 
-export default function UserNavbar({ user, onLogout }) {
+export default function UserNavbar({ user, onLogout, onToggleSidebar, isSidebarOpen }) {
     const [isOpen, setIsOpen] = useState(false);
     const [showNotifications, setShowNotifications] = useState(false);
     const [notifications, setNotifications] = useState([]);
@@ -21,18 +21,21 @@ export default function UserNavbar({ user, onLogout }) {
             collection(userDB, "notifications"),
             where("userId", "==", user.uid),
             where("role", "==", "user"),
-            where("read", "==", false),
-            orderBy("createdAt", "desc"),
-            limit(10)
+            where("read", "==", false)
         );
 
-        const unsubscribe = onSnapshot(q, (snapshot) => {
-            const notifs = [];
-            snapshot.forEach((doc) => {
-                notifs.push({ id: doc.id, ...doc.data() });
-            });
-            setNotifications(notifs);
-        });
+        const unsubscribe = onSnapshot(q,
+            (snapshot) => {
+                const notifs = snapshot.docs
+                    .map(doc => ({ id: doc.id, ...doc.data() }))
+                    .sort((a, b) => (b.createdAt?.toDate?.() || new Date(0)) - (a.createdAt?.toDate?.() || new Date(0)))
+                    .slice(0, 10);
+                setNotifications(notifs);
+            },
+            (error) => {
+                console.error("Firestore User Notification Listener Error:", error);
+            }
+        );
 
         return () => unsubscribe();
     }, [user]);
@@ -80,8 +83,17 @@ export default function UserNavbar({ user, onLogout }) {
 
     return (
         <nav className="user-navbar">
-            <div className="user-nav-links">
-                <h1>Welcome to User panel 🙋‍♂️ </h1>
+            <div className="user-nav-left">
+                <button
+                    className="sidebar-toggle-btn"
+                    onClick={onToggleSidebar}
+                    aria-label="Toggle Sidebar"
+                >
+                    {isSidebarOpen ? <X size={24} /> : <List size={24} />}
+                </button>
+                <div className="user-nav-links">
+                    <h1>Welcome, {user?.firstName || "User"} 👋</h1>
+                </div>
             </div>
 
             <div style={{ display: 'flex', alignItems: 'center', gap: '20px' }}>
@@ -138,6 +150,17 @@ export default function UserNavbar({ user, onLogout }) {
                                         </div>
                                     ))
                                 )}
+                            </div>
+                            <div style={{ padding: '12px', borderTop: '1px solid #f1f5f9', textAlign: 'center' }}>
+                                <button
+                                    onClick={() => {
+                                        setShowNotifications(false);
+                                        navigate('/user/notifications');
+                                    }}
+                                    style={{ background: 'none', border: 'none', color: '#3b82f6', fontSize: '13px', fontWeight: '700', cursor: 'pointer' }}
+                                >
+                                    View All Notifications
+                                </button>
                             </div>
                         </div>
                     )}

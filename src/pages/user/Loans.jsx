@@ -2,6 +2,8 @@ import React, { useState, useEffect } from 'react';
 import { useCurrentUser } from '../../hooks/useCurrentUser';
 import { collection, addDoc, query, where, onSnapshot, serverTimestamp } from 'firebase/firestore';
 import { userDB } from '../../firebaseUser';
+import { Bank, CashCoin, CheckCircle, XCircle, ClockHistory, FileEarmarkText } from 'react-bootstrap-icons';
+import './Loans.css';
 
 export default function Loans() {
   const { currentUser, loading } = useCurrentUser();
@@ -46,7 +48,7 @@ export default function Loans() {
     setSubmitting(true);
     try {
       // 1. Create Loan Application
-      const appRef = await addDoc(collection(userDB, 'loanApplications'), {
+      await addDoc(collection(userDB, 'loanApplications'), {
         userId: currentUser.uid,
         userEmail: currentUser.email,
         userName: currentUser.displayName,
@@ -79,63 +81,49 @@ export default function Loans() {
     }
   };
 
-  if (loading || !currentUser) return <div style={{ padding: '40px', textAlign: 'center' }}>Loading Secure Data...</div>;
+  if (loading || !currentUser) return <div className="p-10 text-center">Loading Secure Data...</div>;
 
   return (
-    <div style={{ padding: '24px', color: 'black', maxWidth: '1000px', margin: '0 auto' }}>
-      <h1 style={{ marginBottom: '8px' }}>Loans & Credit</h1>
-      <p style={{ color: '#64748b', marginBottom: '32px' }}>Manage your loans or apply for a new one.</p>
+    <div className="loans-main">
+      <div className="loans-hero">
+        <h1><Bank className="mb-1" /> Loans & Credit</h1>
+        <p style={{color:"white"}}>Manage your loans or apply for a new one with instant approval tracking.</p>
+      </div>
 
       {/* RENDER ACTIVE/HISTORY APPLICATIONS */}
-      <h3 style={{ marginBottom: '16px' }}>My Applications</h3>
+      <h3 className="section-title-loans"><ClockHistory /> My Applications</h3>
       {applications.length === 0 ? (
-        <div style={{ background: '#f8fafc', borderRadius: '16px', border: '2px dashed #cbd5e1', padding: '30px', textAlign: 'center', marginBottom: '32px' }}>
-          <p style={{ color: '#64748b', margin: 0 }}>No loan applications found. Start by applying below.</p>
+        <div className="loans-empty-state">
+          <p className="empty-loan-text">No loan applications found. Start by applying below.</p>
         </div>
       ) : (
-        <div style={{ display: 'grid', gap: '16px', marginBottom: '40px' }}>
+        <div className="apps-container">
           {applications.map(app => (
-            <div key={app.id} style={{
-              background: 'white',
-              borderRadius: '16px',
-              border: '1px solid #e2e8f0',
-              padding: '20px',
-              display: 'flex',
-              justifyContent: 'space-between',
-              alignItems: 'center'
-            }}>
-              <div>
-                <div style={{ display: 'flex', alignItems: 'center', gap: '12px', marginBottom: '8px' }}>
-                  <span style={{
-                    background: app.status === 'approved' ? '#dcfce7' : app.status === 'rejected' ? '#fee2e2' : '#fef3c7',
-                    color: app.status === 'approved' ? '#166534' : app.status === 'rejected' ? '#991b1b' : '#92400e',
-                    padding: '4px 12px',
-                    borderRadius: '20px',
-                    fontSize: '11px',
-                    fontWeight: '700',
-                    textTransform: 'uppercase'
-                  }}>
+            <div key={app.id} className="loan-app-card">
+              <div className="app-main-info">
+                <div className="app-header-row">
+                  <span className={`status-badge ${app.status}`}>
                     {app.status}
                   </span>
-                  <strong style={{ fontSize: '16px' }}>{app.loanType}</strong>
+                  <strong className="app-type-pill">{app.loanType}</strong>
                 </div>
-                <p style={{ margin: 0, color: '#64748b', fontSize: '14px' }}>
+                <p className="app-details-text">
                   Amount: ₹{app.amount.toLocaleString()} | Tenure: {app.tenureMonths} Months
                 </p>
                 {app.status === 'approved' && (
-                  <p style={{ margin: '8px 0 0 0', color: '#10b981', fontSize: '13px', fontWeight: '500' }}>
-                    ✅ Approved! Expected disbursement in {app.expectedDisbursementDays} days.
+                  <p className="app-feedback-msg success">
+                    <CheckCircle className="me-2" /> Approved! Expected disbursement in {app.expectedDisbursementDays || 2} days.
                   </p>
                 )}
                 {app.status === 'rejected' && (
-                  <p style={{ margin: '8px 0 0 0', color: '#ef4444', fontSize: '13px', fontWeight: '500' }}>
-                    ❌ Rejected: {app.rejectionReason}
+                  <p className="app-feedback-msg error">
+                    <XCircle className="me-2" /> Rejected: {app.rejectionReason}
                   </p>
                 )}
               </div>
-              <div style={{ textAlign: 'right' }}>
-                <p style={{ margin: 0, fontSize: '12px', color: '#94a3b8' }}>
-                  Applied on: {app.createdAt?.toDate().toLocaleDateString()}
+              <div className="app-meta-info">
+                <p className="app-date">
+                  <FileEarmarkText className="me-1" /> Applied on: {app.createdAt?.toDate().toLocaleDateString()}
                 </p>
               </div>
             </div>
@@ -144,17 +132,17 @@ export default function Loans() {
       )}
 
       {/* NEW APPLICATION FORM */}
-      <div style={{ background: 'white', borderRadius: '16px', border: '1px solid #e2e8f0', padding: '32px', boxShadow: '0 4px 6px -1px rgba(0,0,0,0.1)' }}>
-        <h3 style={{ marginBottom: '24px' }}>Apply for a New Loan</h3>
+      <div className="loan-form-card">
+        <h3><CashCoin className="text-blue-600 mb-1" /> Apply for a New Loan</h3>
 
         <form onSubmit={handleApply}>
-          <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '24px' }}>
-            <div>
-              <label style={{ display: 'block', marginBottom: '8px', fontWeight: '500', color: '#334155' }}>Loan Type</label>
+          <div className="loan-input-grid">
+            <div className="loan-field">
+              <label className="loan-label">Loan Type</label>
               <select
+                className="loan-select"
                 value={formData.loanType}
                 onChange={(e) => setFormData({ ...formData, loanType: e.target.value })}
-                style={{ width: '100%', padding: '12px', borderRadius: '8px', border: '1px solid #cbd5e1', background: 'white' }}
               >
                 <option value="Personal Loan">Personal Loan</option>
                 <option value="Home Loan">Home Loan</option>
@@ -162,23 +150,23 @@ export default function Loans() {
                 <option value="Business Loan">Business Loan</option>
               </select>
             </div>
-            <div>
-              <label style={{ display: 'block', marginBottom: '8px', fontWeight: '500', color: '#334155' }}>Requested Amount (₹)</label>
+            <div className="loan-field">
+              <label className="loan-label">Requested Amount (₹)</label>
               <input
                 type="number"
+                className="loan-input"
                 placeholder="Enter amount"
                 value={formData.amount}
                 onChange={(e) => setFormData({ ...formData, amount: e.target.value })}
-                style={{ width: '100%', padding: '12px', borderRadius: '8px', border: '1px solid #cbd5e1' }}
                 required
               />
             </div>
-            <div>
-              <label style={{ display: 'block', marginBottom: '8px', fontWeight: '500', color: '#334155' }}>Tenure (Months)</label>
+            <div className="loan-field">
+              <label className="loan-label">Tenure (Months)</label>
               <select
+                className="loan-select"
                 value={formData.tenure}
                 onChange={(e) => setFormData({ ...formData, tenure: e.target.value })}
-                style={{ width: '100%', padding: '12px', borderRadius: '8px', border: '1px solid #cbd5e1', background: 'white' }}
               >
                 <option value="12">12 Months</option>
                 <option value="24">24 Months</option>
@@ -187,14 +175,14 @@ export default function Loans() {
                 <option value="60">60 Months</option>
               </select>
             </div>
-            <div>
-              <label style={{ display: 'block', marginBottom: '8px', fontWeight: '500', color: '#334155' }}>Reason for Loan</label>
+            <div className="loan-field">
+              <label className="loan-label">Reason for Loan</label>
               <input
                 type="text"
+                className="loan-input"
                 placeholder="e.g. Home renovation"
                 value={formData.reason}
                 onChange={(e) => setFormData({ ...formData, reason: e.target.value })}
-                style={{ width: '100%', padding: '12px', borderRadius: '8px', border: '1px solid #cbd5e1' }}
                 required
               />
             </div>
@@ -203,20 +191,7 @@ export default function Loans() {
           <button
             type="submit"
             disabled={submitting}
-            style={{
-              marginTop: '24px',
-              background: '#3b82f6',
-              color: 'white',
-              border: 'none',
-              padding: '12px 32px',
-              borderRadius: '8px',
-              fontSize: '16px',
-              fontWeight: '600',
-              cursor: submitting ? 'not-allowed' : 'pointer',
-              boxShadow: '0 4px 14px 0 rgba(59, 130, 246, 0.39)',
-              transition: 'all 0.2s',
-              opacity: submitting ? 0.7 : 1
-            }}
+            className="loan-submit-btn"
           >
             {submitting ? 'Submitting...' : 'Submit Application'}
           </button>

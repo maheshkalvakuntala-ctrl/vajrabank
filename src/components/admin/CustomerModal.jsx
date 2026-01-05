@@ -12,167 +12,143 @@ export default function CustomerModal({ customer, overrides, onAction, onClose }
 
     const handleRemarkSave = () => {
         onAction.addRemark(customer.customerId, remarkText);
-        alert("Remark Saved!");
+        alert("Case Remarks Synchronized Successfully.");
     };
 
     return (
-        <div className="modal-overlay" style={{
-            position: 'fixed',
-            top: 0, left: 0, right: 0, bottom: 0,
-            background: 'rgba(0,0,0,0.5)',
-            display: 'flex', alignItems: 'center', justifyContent: 'center',
-            zIndex: 1000
-        }}>
-            <div className="modal-content" style={{
-                background: 'white',
-                borderRadius: '12px',
-                width: '800px',
-                maxWidth: '95%',
-                maxHeight: '90vh',
-                display: 'flex',
-                flexDirection: 'column',
-                overflow: 'hidden'
-            }}>
+        <div className="admin-modal-overlay" onClick={(e) => e.target.classList.contains('admin-modal-overlay') && onClose()}>
+            <div className="admin-modal-content">
+
                 {/* HEADER */}
-                <div style={{ padding: '20px', borderBottom: '1px solid #eee', display: 'flex', justifyContent: 'space-between', alignItems: 'center', background: isFlagged ? '#fee2e2' : 'white' }}>
+                <div className={`admin-modal-header ${isFlagged ? 'danger-bg' : ''}`}>
                     <div>
-                        <h2 style={{ margin: 0 }}>{customer.fullName}</h2>
-                        <span style={{ color: '#6b7280', fontSize: '14px' }}>ID: {customer.customerId}</span>
-                        {isFlagged && <span style={{ marginLeft: '12px', color: '#dc2626', fontWeight: 'bold' }}>⚠️ SUSPICIOUS</span>}
+                        <h2 className="admin-modal-title">{customer.fullName}</h2>
+                        <span className="admin-modal-subtitle">ENTITY ID: {customer.customerId}</span>
+                        {isFlagged && <span style={{ marginLeft: '16px', color: '#ef4444', fontWeight: '900', fontSize: '12px', textTransform: 'uppercase' }}>⚠️ SUSPICIOUS ACTIVITY</span>}
                     </div>
-                    <button onClick={onClose} style={{ background: 'none', border: 'none', fontSize: '24px', cursor: 'pointer' }}>×</button>
+                    <button onClick={onClose} className="close-modal-btn">×</button>
                 </div>
 
-                {/* BODY - SCROLLABLE */}
-                <div style={{ padding: '24px', overflowY: 'auto', flex: 1 }}>
+                {/* BODY */}
+                <div className="admin-modal-body">
 
                     {/* 1. KEY METRICS */}
-                    <div style={{ display: 'grid', gridTemplateColumns: 'repeat(4, 1fr)', gap: '16px', marginBottom: '32px' }}>
-                        <div style={{ background: '#f8fafc', padding: '12px', borderRadius: '8px' }}>
-                            <label style={{ fontSize: '12px', color: '#64748b' }}>Account Balance</label>
-                            <div style={{ fontSize: '18px', fontWeight: '600', color: customer.balance < 0 ? '#ef4444' : '#0f172a' }}>
+                    <div className="modal-stats-grid">
+                        <div className="modal-stat-card">
+                            <label className="modal-stat-label">Verified Balance</label>
+                            <div className="modal-stat-value" style={{ color: customer.balance < 0 ? '#ef4444' : 'var(--accent-primary)' }}>
                                 ₹{customer.balance.toLocaleString()}
                             </div>
                         </div>
-                        <div style={{ background: '#f8fafc', padding: '12px', borderRadius: '8px' }}>
-                            <label style={{ fontSize: '12px', color: '#64748b' }}>Risk Level</label>
-                            <div className={`risk-badge risk-${customer.riskLevel.toLowerCase()}`} style={{ display: 'inline-block', marginTop: '4px' }}>
-                                {customer.riskLevel}
+                        <div className="modal-stat-card">
+                            <label className="modal-stat-label">Risk Profile</label>
+                            <div style={{ marginTop: '4px' }}>
+                                <span className={`risk-badge risk-${customer.riskLevel.toLowerCase()}`} style={{ padding: '2px 8px', borderRadius: '4px', fontSize: '11px', fontWeight: 800 }}>
+                                    {customer.riskLevel}
+                                </span>
                             </div>
                         </div>
-                        <div style={{ background: '#f8fafc', padding: '12px', borderRadius: '8px' }}>
-                            <label style={{ fontSize: '12px', color: '#64748b' }}>CIBIL Score</label>
-                            <div style={{ fontSize: '18px', fontWeight: 'bold', color: customer.cibilScore < 650 ? '#dc2626' : '#16a34a' }}>
+                        <div className="modal-stat-card">
+                            <label className="modal-stat-label">CIBIL Intel</label>
+                            <div className="modal-stat-value" style={{ color: customer.cibilScore < 650 ? '#ef4444' : '#10b981' }}>
                                 {customer.cibilScore}
                             </div>
                         </div>
-                        <div style={{ background: '#f8fafc', padding: '12px', borderRadius: '8px' }}>
-                            <label style={{ fontSize: '12px', color: '#64748b' }}>Status</label>
-                            <div style={{ fontSize: '16px', fontWeight: '500' }}>
-                                {isFrozen ? '❄️ Frozen' : customer.activeStatus}
+                        <div className="modal-stat-card">
+                            <label className="modal-stat-label">Network Status</label>
+                            <div className="modal-stat-value" style={{ fontSize: '15px' }}>
+                                {isFrozen ? '❄️ Restricted' : customer.activeStatus}
                             </div>
                         </div>
                     </div>
 
                     {/* 2. DETAIL SECTIONS */}
-                    <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '32px' }}>
+                    <div className="modal-details-split">
 
-                        {/* LEFT: PERSONAL INFO */}
+                        {/* LEFT: IDENTITY & HEALTH */}
                         <div>
-                            <h4 style={{ borderBottom: '2px solid #3b82f6', paddingBottom: '8px', marginBottom: '16px' }}>Personal Details</h4>
-                            <div style={{ display: 'grid', gap: '12px' }}>
-                                <div className="detail-row"><span>Email:</span> <strong>{customer.email}</strong></div>
-                                <div className="detail-row"><span>Phone:</span> <strong>{customer.raw['Contact Number']}</strong></div>
-                                <div className="detail-row"><span>Address:</span> <strong>{customer.raw['Address']}</strong></div>
-                                <div className="detail-row"><span>Gender:</span> <strong>{customer.gender}</strong></div>
-                                <div className="detail-row"><span>Age:</span> <strong>{customer.age}</strong></div>
-                            </div>
+                            <h4 className="detail-section-title">Identity Parameters</h4>
+                            <div className="info-row"><span className="info-label">Email Handle</span> <span className="info-value">{customer.email}</span></div>
+                            <div className="info-row"><span className="info-label">Direct Line</span> <span className="info-value">{customer.raw['Contact Number']}</span></div>
+                            <div className="info-row"><span className="info-label">Registered Residency</span> <span className="info-value" style={{ maxWidth: '200px', textAlign: 'right' }}>{customer.raw['Address']}</span></div>
+                            <div className="info-row"><span className="info-label">Demographics</span> <span className="info-value">{customer.gender} | {customer.age} YRS</span></div>
 
-                            <h4 style={{ borderBottom: '2px solid #3b82f6', paddingBottom: '8px', marginBottom: '16px', marginTop: '32px' }}>Financial Health</h4>
-                            <div style={{ display: 'grid', gap: '12px' }}>
-                                <div className="detail-row"><span>Credit Util:</span> <strong>{Math.round(customer.raw['Credit Utilization'] * 100)}%</strong></div>
-                                <div className="detail-row"><span>Credit Limit:</span> <strong>₹{customer.raw['Credit Limit']}</strong></div>
-                                <div className="detail-row"><span>Payment Delay:</span> <strong style={{ color: customer.paymentDelay > 60 ? 'red' : 'inherit' }}>{customer.paymentDelay} days</strong></div>
-                            </div>
+                            <h4 className="detail-section-title" style={{ marginTop: '32px' }}>Financial Integrity</h4>
+                            <div className="info-row"><span className="info-label">Credit Exposure</span> <span className="info-value">{Math.round(customer.raw['Credit Utilization'] * 100)}%</span></div>
+                            <div className="info-row"><span className="info-label">Approved Limit</span> <span className="info-value">₹{customer.raw['Credit Limit'].toLocaleString()}</span></div>
+                            <div className="info-row"><span className="info-label">Portfolio Age</span> <span className="info-value">Since 2021-08-12</span></div>
+                            <div className="info-row"><span className="info-label">Payment Latency</span> <span className="info-value" style={{ color: customer.paymentDelay > 60 ? '#ef4444' : 'inherit' }}>{customer.paymentDelay} Days</span></div>
                         </div>
 
-                        {/* RIGHT: ADMIN ACTIONS */}
-                        <div style={{ background: '#fef2f2', padding: '20px', borderRadius: '12px', border: '1px solid #fee2e2' }}>
-                            <h4 style={{ color: '#991b1b', marginTop: 0, marginBottom: '20px' }}>⚠️ Admin Actions</h4>
+                        {/* RIGHT: COMMAND CENTER */}
+                        <div className="admin-action-box">
+                            <h4 className="action-box-title">⚡ Command & Control</h4>
 
-                            <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: '16px', background: 'white', padding: '12px', borderRadius: '8px' }}>
-                                <div>
-                                    <strong>Freeze Account</strong>
-                                    <p style={{ margin: 0, fontSize: '12px', color: '#6b7280' }}>Prevent all transactions</p>
+                            <div className="action-item-card">
+                                <div className="action-item-info">
+                                    <strong>Freeze Entity</strong>
+                                    <p>Halt all outgoing capital</p>
                                 </div>
-                                <label className="switch">
+                                <label className="switch-alt">
                                     <input
                                         type="checkbox"
                                         checked={isFrozen}
                                         onChange={() => onAction.toggleFreeze(customer.customerId, isFrozen)}
                                     />
-                                    <span className="slider round"></span>
+                                    <span className="slider-alt"></span>
                                 </label>
                             </div>
 
-                            <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: '24px', background: 'white', padding: '12px', borderRadius: '8px' }}>
-                                <div>
-                                    <strong>Flag Suspicious</strong>
-                                    <p style={{ margin: 0, fontSize: '12px', color: '#6b7280' }}>Mark for high-priority review</p>
+                            <div className="action-item-card">
+                                <div className="action-item-info">
+                                    <strong>Flag for Review</strong>
+                                    <p>Mark as high-priority alert</p>
                                 </div>
-                                <label className="switch">
+                                <label className="switch-alt">
                                     <input
                                         type="checkbox"
                                         checked={isFlagged}
                                         onChange={() => onAction.toggleFlag(customer.customerId, isFlagged)}
                                     />
-                                    <span className="slider round"></span>
+                                    <span className="slider-alt"></span>
                                 </label>
                             </div>
 
-                            <div>
-                                <label style={{ display: 'block', marginBottom: '8px', fontWeight: '500' }}>Admin Remarks</label>
+                            <div style={{ marginTop: '24px' }}>
+                                <label className="filter-label-admin" style={{ marginBottom: '10px', display: 'block' }}>Operational Remarks</label>
                                 <textarea
                                     rows="4"
-                                    style={{ width: '100%', padding: '8px', borderRadius: '8px', border: '1px solid #d1d5db' }}
-                                    placeholder="Add notes about this case..."
+                                    className="admin-textarea"
+                                    placeholder="Input investigative notes..."
                                     value={remarkText}
                                     onChange={(e) => setRemarkText(e.target.value)}
                                 />
-                                <button
-                                    onClick={handleRemarkSave}
-                                    style={{ marginTop: '8px', padding: '6px 12px', background: '#3b82f6', color: 'white', border: 'none', borderRadius: '4px', cursor: 'pointer', float: 'right' }}
-                                >
-                                    Save Note
-                                </button>
+                                <div style={{ display: 'flex', justifyContent: 'flex-end' }}>
+                                    <button onClick={handleRemarkSave} className="admin-save-btn">
+                                        Sync Case
+                                    </button>
+                                </div>
                             </div>
-
                         </div>
                     </div>
-
                 </div>
 
                 {/* FOOTER */}
-                <div style={{ padding: '16px 24px', borderTop: '1px solid #eee', display: 'flex', justifyContent: 'flex-end' }}>
-                    <button onClick={onClose} style={{ padding: '8px 24px', borderRadius: '6px', border: '1px solid #ddd', background: 'white', color: '#374151', cursor: 'pointer' }}>
-                        Close
+                <div style={{ padding: '24px 32px', borderTop: '1px solid var(--divider-color)', display: 'flex', justifyContent: 'flex-end' }}>
+                    <button onClick={onClose} className="pg-btn" style={{ padding: '10px 30px' }}>
+                        Exit Surveillance
                     </button>
                 </div>
             </div>
 
-            {/* CSS for Toggles included here for simplicity */}
             <style>{`
-        .detail-row { display: flex; justify-content: space-between; padding-bottom: 8px; border-bottom: 1px dashed #e2e8f0; }
-        .switch { position: relative; display: inline-block; width: 44px; height: 24px; }
-        .switch input { opacity: 0; width: 0; height: 0; }
-        .slider { position: absolute; cursor: pointer; top: 0; left: 0; right: 0; bottom: 0; background-color: #ccc; -webkit-transition: .4s; transition: .4s; }
-        .slider:before { position: absolute; content: ""; height: 18px; width: 18px; left: 3px; bottom: 3px; background-color: white; -webkit-transition: .4s; transition: .4s; }
-        input:checked + .slider { background-color: #ef4444; }
-        input:focus + .slider { box-shadow: 0 0 1px #ef4444; }
-        input:checked + .slider:before { -webkit-transform: translateX(20px); -ms-transform: translateX(20px); transform: translateX(20px); }
-        .slider.round { border-radius: 34px; }
-        .slider.round:before { border-radius: 50%; }
-      `}</style>
+                .switch-alt { position: relative; display: inline-block; width: 44px; height: 24px; }
+                .switch-alt input { opacity: 0; width: 0; height: 0; }
+                .slider-alt { position: absolute; cursor: pointer; top: 0; left: 0; right: 0; bottom: 0; background-color: #cbd5e1; transition: .3s; border-radius: 34px; }
+                .slider-alt:before { position: absolute; content: ""; height: 18px; width: 18px; left: 3px; bottom: 3px; background-color: white; transition: .3s; border-radius: 50%; }
+                input:checked + .slider-alt { background-color: #ef4444; }
+                input:checked + .slider-alt:before { transform: translateX(20px); }
+            `}</style>
         </div>
     );
 }

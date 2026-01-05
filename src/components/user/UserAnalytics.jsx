@@ -5,6 +5,7 @@ import {
 } from 'recharts';
 import { useBankData } from '../../hooks/useBankData';
 import { useCurrentUser } from '../../hooks/useCurrentUser';
+import CreditUtilization from './CreditUtilization';
 
 // ================= THEME CONSTANTS (FINTECH DARK) =================
 const THEME = {
@@ -159,6 +160,10 @@ export default function UserAnalytics() {
             percent: utilization.toFixed(2)
         });
 
+        // Use Firebase user values if available as they are more "live"
+        const finalUsed = currentUser.creditBalance !== undefined ? currentUser.creditBalance : latestCreditUsed;
+        const finalLimit = currentUser.creditLimit !== undefined ? currentUser.creditLimit : latestCreditLimit;
+
         // STEP 5: Balance Trend (Use actual balance from transactions)
         const balanceTrend = normalizedTxns.map(t => ({
             name: `${t.day} ${t.month.slice(0, 3)}`,
@@ -223,6 +228,8 @@ export default function UserAnalytics() {
             spending: spending.length > 0 ? spending : [{ name: 'No Spending Record', value: 1 }],
             balance: balanceTrend.sort((a, b) => a.sortKey.localeCompare(b.sortKey)).slice(-30),
             utilization: utilization.toFixed(2),
+            creditUsed: finalUsed,
+            creditLimit: finalLimit,
             utilizationColor: utilization < 30 ? '#10b981' : utilization < 70 ? '#f59e0b' : '#ef4444',
             upcoming: upcoming,
             emiVsOthers: emiVsOthers
@@ -340,34 +347,7 @@ export default function UserAnalytics() {
                 </div>
 
                 {/* 3. Credit Utilization */}
-                <div style={CardBase}>
-                    <h4 style={HeaderStyle}>CREDIT UTILIZATION</h4>
-                    <div style={{ flex: 1, display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center', position: 'relative' }}>
-                        <div style={{ width: '260px', height: '130px', position: 'relative', overflow: 'hidden' }}>
-                            {/* Track */}
-                            <div style={{ width: '260px', height: '260px', borderRadius: '50%', border: '25px solid #141d3a', boxSizing: 'border-box' }}></div>
-                            {/* Active */}
-                            <div style={{
-                                position: 'absolute', top: 0, left: 0, width: '260px', height: '130px',
-                                borderTopLeftRadius: '130px', borderTopRightRadius: '130px',
-                                background: `conic-gradient(from 270deg at 50% 100%, ${metrics.utilizationColor} 0%, ${metrics.utilizationColor} ${Math.min(50, Number(metrics.utilization) / 2)}%, transparent ${Math.min(50, Number(metrics.utilization) / 2)}%)`,
-                                opacity: 0.9,
-                                mask: 'radial-gradient(transparent 90px, black 91px)',
-                                WebkitMask: 'radial-gradient(transparent 90px, black 91px)'
-                            }}></div>
-                            {/* Center Value */}
-                            <div style={{ position: 'absolute', bottom: '0', left: '50%', transform: 'translateX(-50%)', textAlign: 'center' }}>
-                                <h1 style={{ color: 'white', fontSize: '56px', margin: 0, fontWeight: '700' }}>{Math.floor(metrics.utilization)}</h1>
-                                <p style={{ color: THEME.textSub, fontSize: '13px', marginTop: '-8px' }}>% USED</p>
-                            </div>
-                        </div>
-                        <div style={{ display: 'flex', justifyContent: 'space-between', width: '260px', marginTop: '10px', color: THEME.textSub, fontSize: '12px' }}>
-                            <span>0.00</span>
-                            <span style={{ color: '#fff', opacity: 0.4 }}>{metrics.utilization}</span>
-                            <span>100.00</span>
-                        </div>
-                    </div>
-                </div>
+                <CreditUtilization used={metrics.creditUsed} limit={metrics.creditLimit} />
 
                 {/* 4. Balance Trend - Enhanced Area Chart */}
                 <div style={CardBase}>

@@ -1,27 +1,33 @@
 import { NavLink } from "react-router-dom";
+import { X } from "react-bootstrap-icons";
 import "../styles/AdminSidebar.css";
 
-export default function Sidebar() {
+export default function Sidebar({ isOpen, onClose }) {
 
   return (
-    <aside className="admin-sidebar">
+    <aside className={`admin-sidebar ${isOpen ? "open" : ""}`}>
       <div>
         {/* HEADER */}
         <div className="admin-sidebar-header">
-          <h2>BankAdmin</h2>
+          <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+            <h2>BankAdmin</h2>
+            <button className="mobile-close-btn" onClick={onClose} style={{ display: 'none' }}>
+              <X size={24} />
+            </button>
+          </div>
           <p>Admin Dashboard</p>
         </div>
 
         {/* MENU */}
         <ul className="admin-sidebar-menu">
-          <li><NavLink to="dashboard">Dashboard</NavLink></li>
-          <li><NavLink to="profile">Profile</NavLink></li>
-          <li><NavLink to="customers">Customers</NavLink></li>
-          <li><NavLink to="accounts">Accounts</NavLink></li>
-          <li><NavLink to="cards">Cards</NavLink></li>
-          <li><NavLink to="loans">Loans</NavLink></li>
-          <li><NavLink to="kyc">KYC</NavLink></li>
-          <li><NavLink to="reports">Reports</NavLink></li>
+          <li><NavLink to="dashboard" onClick={onClose}>Dashboard</NavLink></li>
+          <li><NavLink to="profile" onClick={onClose}>Profile</NavLink></li>
+          <li><NavLink to="customers" onClick={onClose}>Customers</NavLink></li>
+          <li><NavLink to="accounts" onClick={onClose}>Accounts</NavLink></li>
+          <li><NavLink to="cards" onClick={onClose}>Cards</NavLink></li>
+          <li><NavLink to="loans" onClick={onClose}>Loans</NavLink></li>
+          <li><NavLink to="kyc" onClick={onClose}>KYC</NavLink></li>
+          <li><NavLink to="reports" onClick={onClose}>Reports</NavLink></li>
         </ul>
       </div>
     </aside>

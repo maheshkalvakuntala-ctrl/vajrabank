@@ -1,15 +1,15 @@
 /* SOLID WHITE HEADER */
 .admin-navbar {
     height: 64px;
-    background: rgb(239, 240, 242);
+    background: white;
     border-bottom: 1px solid var(--border-color);
     display: flex;
     align-items: center;
     justify-content: flex-end;
-    padding: 0 32px;
+    padding: 0 var(--container-padding);
     position: sticky;
     top: 0;
-    z-index: 40;
+    z-index: 100;
     width: 100%;
     box-shadow: 0 1px 2px 0 rgba(0, 0, 0, 0.03);
 }
@@ -21,13 +21,34 @@
     margin-left: 24px;
 }
 
-.admin-nav-links {
-    margin-right: auto;
+.admin-nav-left {
     display: flex;
-    gap: 24px;
-    font-weight: bold;
-    font-size: large;
-    /* Push links left */
+    align-items: center;
+    gap: var(--space-sm);
+    margin-right: auto;
+}
+
+.sidebar-toggle-btn {
+    display: none;
+    background: none;
+    border: none;
+    color: var(--text-secondary);
+    cursor: pointer;
+    padding: 8px;
+    border-radius: 8px;
+    align-items: center;
+    justify-content: center;
+}
+
+.sidebar-toggle-btn:hover {
+    background: #f3f4f6;
+}
+
+.admin-nav-links h1 {
+    font-size: var(--fs-lg);
+    font-weight: 700;
+    color: var(--text-primary);
+    margin: 0;
 }
 
 /* PROFILE TRIGGER */
