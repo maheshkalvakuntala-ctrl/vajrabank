@@ -4,6 +4,7 @@ import { useAdminActions } from '../../hooks/useAdminActions';
 import CustomerTable from '../../components/admin/CustomerTable';
 import CustomerFilters from '../../components/admin/CustomerFilters';
 import CustomerModal from '../../components/admin/CustomerModal';
+import "./AdminDashboard.css";
 
 export default function Customers() {
   const { data, loading, error } = useBankData();
@@ -38,12 +39,14 @@ export default function Customers() {
     });
   }, [processedData, filters]);
 
-  if (loading) return <div>Loading...</div>;
+  if (loading) return <div className="p-10 text-center">Loading Customer Directory...</div>;
 
   return (
-    <div style={{ padding: '24px', color: 'black' }}>
-      <h1 style={{ marginBottom: '24px' }}>Customer Registry</h1>
+    <div className="customers-main">
+      <h1 className="customers-title">Customer Registry</h1>
+
       <CustomerFilters filters={filters} setFilters={setFilters} />
+
       <CustomerTable data={filteredData} onView={setSelectedCustomer} />
 
       <CustomerModal

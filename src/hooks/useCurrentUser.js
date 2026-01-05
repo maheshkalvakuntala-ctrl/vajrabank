@@ -1,5 +1,7 @@
 import { useMemo, useState, useEffect } from 'react';
 import { useAuth } from '../context/AuthContext';
+import { doc, updateDoc } from 'firebase/firestore';
+import { userDB } from '../firebaseUser';
 
 export const useCurrentUser = () => {
     const { user: authUser } = useAuth();
@@ -19,11 +21,23 @@ export const useCurrentUser = () => {
         }
     }, [authUser]);
 
-    const updateUserProfile = (updates) => {
+    const updateUserProfile = async (updates) => {
         if (!authUser) return;
+
+        // Always update local state for instant feedback
         const newUpdates = { ...localUpdates, ...updates };
         setLocalUpdates(newUpdates);
         localStorage.setItem(`userUpdates_${authUser.email}`, JSON.stringify(newUpdates));
+
+        // Sync with Firestore if user is authenticated via Firebase
+        if (authUser.uid) {
+            try {
+                const userRef = doc(userDB, 'users', authUser.uid);
+                await updateDoc(userRef, updates);
+            } catch (err) {
+                console.error("Failed to sync updates to Firestore", err);
+            }
+        }
     };
 
     const currentUser = useMemo(() => {

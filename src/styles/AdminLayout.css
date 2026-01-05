@@ -14,10 +14,9 @@ body {
 .admin-layout {
   display: flex;
   height: 100vh;
-  /* Full viewport height */
-  background: #0b1220;
+  background: var(--bg-primary);
   overflow: hidden;
-  /* Prevent body scrolling */
+  position: relative;
 }
 
 .admin-main {
@@ -26,6 +25,7 @@ body {
   flex-direction: column;
   height: 100vh;
   min-width: 0;
+  position: relative;
 }
 
 .admin-content {

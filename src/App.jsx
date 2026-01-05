@@ -41,8 +41,15 @@ import Feedback from "./pages/user/Feedback";
 import Payments from "./pages/user/Payments";
 import Rewards from "./pages/user/Rewards";
 import InternationalTransfer from "./pages/user/InternationalTransfer";
+import Notifications from "./pages/user/Notifications";
 
+/* TOOLS */
 import LoanCalculatorPage from "./pages/LoanCalculatorPage";
+import ROI from "./pages/tools/ROI";
+import CardsTool from "./pages/tools/CardsTool";
+import Transfers from "./pages/tools/Transfers";
+import Business from "./pages/tools/Business";
+import Global from "./pages/tools/Global";
 
 export default function App() {
   return (
@@ -56,7 +63,16 @@ export default function App() {
             <Route path="/contact" element={<Contact />} />
             <Route path="/login" element={<Login />} />
             <Route path="/signup" element={<SignUp />} />
-            <Route path="/features/loan-calculator" element={<LoanCalculatorPage />} />
+
+            {/* 🛠️ TOOLS & CALCULATORS */}
+            <Route path="/tools">
+              <Route path="loan-calculator" element={<LoanCalculatorPage />} />
+              <Route path="roi" element={<ROI />} />
+              <Route path="cards" element={<CardsTool />} />
+              <Route path="transfers" element={<Transfers />} />
+              <Route path="business" element={<Business />} />
+              <Route path="global" element={<Global />} />
+            </Route>
           </Route>
 
           {/* 🔐 ADMIN LOGIN (No Layout) */}
@@ -93,6 +109,7 @@ export default function App() {
             <Route path="payments" element={<Payments />} />
             <Route path="rewards" element={<Rewards />} />
             <Route path="international" element={<InternationalTransfer />} />
+            <Route path="notifications" element={<Notifications />} />
           </Route>
 
           {/* ❌ FALLBACK */}

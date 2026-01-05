@@ -1,0 +1,208 @@
+.signup-container {
+    min-height: 100vh;
+    background: radial-gradient(circle at top, #080f25 0%, #020617 100%);
+    padding: var(--space-xl) var(--container-padding);
+    display: flex;
+    justify-content: center;
+    align-items: center;
+}
+
+.signup-card {
+    background: rgba(12, 20, 44, 0.6);
+    backdrop-filter: blur(20px);
+    border: 1px solid var(--border-color);
+    border-radius: 24px;
+    padding: var(--space-xl);
+    max-width: 800px;
+    width: 100%;
+    box-shadow: 0 30px 60px rgba(0, 0, 0, 0.5);
+}
+
+.signup-title {
+    color: #fff;
+    font-size: var(--fs-2xl);
+    font-weight: 800;
+    margin-bottom: 8px;
+    text-align: center;
+}
+
+.signup-subtitle {
+    color: #94a3b8;
+    font-size: var(--fs-sm);
+    text-align: center;
+    margin-bottom: var(--space-lg);
+}
+
+.progress-container {
+    display: flex;
+    justify-content: space-between;
+    margin-bottom: var(--space-xl);
+    position: relative;
+    gap: 10px;
+}
+
+.progress-step {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    flex: 1;
+    position: relative;
+}
+
+.progress-circle {
+    width: 40px;
+    height: 40px;
+    border-radius: 50%;
+    background: #1e293b;
+    border: 2px solid #334155;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    color: #64748b;
+    font-weight: 700;
+    margin-bottom: 8px;
+    z-index: 2;
+    transition: all 0.3s;
+}
+
+.progress-circle.active {
+    background: var(--accent-primary);
+    border-color: var(--accent-primary);
+    color: #fff;
+    box-shadow: 0 0 20px rgba(77, 163, 255, 0.4);
+}
+
+.progress-label {
+    color: #94a3b8;
+    font-size: 11px;
+    text-transform: uppercase;
+    letter-spacing: 1px;
+}
+
+.form-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(240px, 1fr));
+    gap: var(--space-md);
+}
+
+.form-group {
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+}
+
+.form-group.full-width {
+    grid-column: 1 / -1;
+}
+
+.form-group label {
+    color: #e2e8f0;
+    font-size: 13px;
+    font-weight: 600;
+}
+
+.signup-input {
+    background: rgba(15, 23, 42, 0.8);
+    border: 1px solid var(--border-color);
+    border-radius: 12px;
+    padding: 14px;
+    color: #fff;
+    font-size: 14px;
+    transition: border-color 0.2s;
+}
+
+.signup-input:focus {
+    border-color: var(--accent-primary);
+    outline: none;
+}
+
+.error-text {
+    color: #ef4444;
+    font-size: 12px;
+}
+
+.step-container {
+    margin-bottom: var(--space-xl);
+}
+
+.step-title {
+    color: #fff;
+    font-size: var(--fs-lg);
+    font-weight: 700;
+    margin-bottom: var(--space-lg);
+}
+
+.signup-input {
+    background: rgba(15, 23, 42, 0.8);
+    border: 1px solid var(--border-color);
+    border-radius: 12px;
+    padding: 14px;
+    color: #fff;
+    font-size: 14px;
+    transition: border-color 0.2s;
+}
+
+.signup-input:focus {
+    border-color: var(--accent-primary);
+    outline: none;
+}
+
+.error-text {
+    color: #ef4444;
+    font-size: 12px;
+}
+
+.button-container {
+    display: flex;
+    justify-content: space-between;
+    gap: 16px;
+    margin-top: var(--space-xl);
+}
+
+.signup-btn-primary {
+    flex: 2;
+    background: linear-gradient(135deg, var(--accent-primary), #2563eb);
+    color: #fff;
+    border: none;
+    border-radius: 12px;
+    padding: 16px;
+    font-size: 16px;
+    font-weight: 700;
+    cursor: pointer;
+    transition: transform 0.2s;
+}
+
+.signup-btn-secondary {
+    flex: 1;
+    background: transparent;
+    color: #94a3b8;
+    border: 1px solid var(--border-color);
+    border-radius: 12px;
+    padding: 16px;
+    font-size: 16px;
+    font-weight: 600;
+    cursor: pointer;
+}
+
+.login-footer {
+    color: #94a3b8;
+    font-size: 14px;
+    text-align: center;
+    margin-top: var(--space-lg);
+}
+
+.login-link {
+    color: var(--accent-primary);
+    text-decoration: none;
+    font-weight: 700;
+}
+
+@media (max-width: 600px) {
+    .signup-card {
+        padding: var(--space-lg);
+    }
+
+    .form-grid {
+        grid-template-columns: 1fr;
+    }
+}

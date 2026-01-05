@@ -1,38 +1,44 @@
 const features = [
   {
     id: "loan-calculator",
+    path: "/tools/loan-calculator",
     title: "Loan EMI Calculator",
     description: "Estimate your monthly EMI, total interest, and repayment amount.",
     icon: "💰"
   },
   {
     id: "investments",
+    path: "/tools/roi",
     title: "Return on Investment",
-    description: "AI-powered portfolio management and intelligent insights.",
+    description: "Calculate your investment growth and maturity with compound interest.",
     icon: "📈",
   },
   {
     id: "credit-cards",
+    path: "/tools/cards",
     title: "Credit & Debit Cards",
-    description: "Cashback rewards, travel benefits, and zero fees.",
+    description: "Manage your cards, view benefits, and apply for new ones.",
     icon: "💳",
   },
   {
     id: "transfer",
+    path: "/tools/transfers",
     title: "Instant Transfers",
-    description: "Send and receive money instantly, 24/7, with zero transaction fees for domestic transfers.",
+    description: "Fast domestic transfers via UPI, Account, or IFSC 24/7.",
     icon: "⚡",
   },
   {
     id: "business-solutions",
+    path: "/tools/business",
     title: "Business Solutions",
-    description: "Comprehensive banking solutions tailored for startups, SMEs, and large enterprises.",
+    description: "SME, Startup, and Enterprise banking with payroll and bulk payments.",
     icon: "🏢",
   },
   {
     id: "global-banking",
+    path: "/tools/global",
     title: "Global Banking",
-    description: "Access your accounts from anywhere in the world with our international banking network.",
+    description: "International transfers and currency exchange with real-time rates.",
     icon: "🚀",
   }
 ];

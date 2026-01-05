@@ -1,6 +1,6 @@
 import { createContext, useContext, useEffect, useState } from "react";
 import { onAuthStateChanged, signOut } from "firebase/auth";
-import { doc, getDoc } from "firebase/firestore";
+import { doc, getDoc, onSnapshot } from "firebase/firestore";
 import { userAuth, userDB } from "../firebaseUser";
 
 const AuthContext = createContext(null);
@@ -40,6 +40,14 @@ export const AuthProvider = ({ children }) => {
               displayName: `${userData.firstName} ${userData.lastName}`,
               ...userData
             });
+
+            // 🔄 Real-time Overrides Listener
+            onSnapshot(doc(userDB, 'overrides', firebaseUser.uid), (snapshot) => {
+              if (snapshot.exists()) {
+                setUser(prev => ({ ...prev, ...snapshot.data() }));
+              }
+            });
+
             // Clear legacy if Firebase takes over
             localStorage.removeItem("legacyUser");
           } else {
