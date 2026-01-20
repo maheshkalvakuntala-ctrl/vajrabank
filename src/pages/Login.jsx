@@ -162,6 +162,40 @@ export default function Login() {
           console.error('Legacy check failed:', legacyErr);
         }
 
+        // FALLBACK TO REST API LOGIN (for partner/admin accounts)
+        try {
+          const { authService } = await import("../services/authService");
+
+          console.log('Attempting REST API login...');
+          const result = await authService.login(email, password);
+
+          if (result.success) {
+            console.log('✅ REST API login successful:', result.user.role);
+
+            // Login successful via REST API
+            await loginUser({
+              uid: result.user.id,
+              email: result.user.email,
+              role: result.user.role,
+              source: "rest-api",
+              displayName: result.user.name,
+              businessName: result.user.businessName
+            });
+
+            // Navigate based on role
+            if (result.user.role === 'admin') {
+              navigate("/admin/dashboard");
+            } else if (result.user.role === 'partner') {
+              navigate("/partner/dashboard");
+            } else {
+              navigate("/user/dashboard");
+            }
+            return;
+          }
+        } catch (apiErr) {
+          console.error('REST API login failed:', apiErr);
+        }
+
         let errorMessage = "Invalid email or password";
 
         if (error.code === 'auth/user-not-found' || error.code === 'auth/invalid-credential') {

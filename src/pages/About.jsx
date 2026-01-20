@@ -16,6 +16,7 @@ import {
   Trophy
 } from "react-bootstrap-icons";
 import Testimonials from "../components/Testimonials";
+import AdBanner from "../components/AdBanner";
 import "./About.css";
 
 /* --- DATA MODELS --- */
@@ -252,6 +253,7 @@ export default function About() {
 
   return (
     <div className="about-v2">
+      <AdBanner />
       {/* 1️⃣ HERO CAROUSEL */}
       <section className="about-hero-viewport">
         <div

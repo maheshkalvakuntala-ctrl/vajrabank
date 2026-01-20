@@ -41,12 +41,24 @@ export default function Navbar() {
               Contact
             </NavLink>
           </li>
+          <li className="partner-link-item">
+            <NavLink
+              to="/partner/subscribe"
+              className="nav-link partner-emoji-link"
+              title="Partner Signup"
+              onClick={() => setIsMenuOpen(false)}
+              style={{ fontSize: '1.2rem', padding: '0 10px', transition: 'transform 0.2s' }}
+            >
+              
+              📢
+            </NavLink>
+          </li>
         </ul>
 
         {/* Actions */}
         <div className="navbar-actions">
           <Link to="/login" className="btn btn-primary" onClick={() => setIsMenuOpen(false)}>
-            Login
+           <span style={{color:"white"}}> Login </span>
           </Link>
         </div>
       </div>

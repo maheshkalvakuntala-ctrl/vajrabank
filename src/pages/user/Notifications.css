@@ -2,6 +2,7 @@
 .notifications-main {
     max-width: 900px;
     margin: 0 auto;
+    
     padding: var(--space-xl) var(--container-padding);
     animation: fadeIn 0.4s ease-out;
 }
@@ -11,6 +12,7 @@
     justify-content: space-between;
     align-items: flex-start;
     gap: var(--space-lg);
+    
     margin-bottom: var(--space-xl);
     flex-wrap: wrap;
 }
@@ -19,6 +21,7 @@
     display: flex;
     align-items: center;
     gap: 12px;
+    
     font-size: var(--fs-2xl);
     font-weight: 800;
     color: var(--text-primary);
@@ -26,6 +29,7 @@
 }
 
 .notifications-header p {
+    
     color: var(--text-secondary);
     margin: 6px 0 0 0;
     font-size: 15px;

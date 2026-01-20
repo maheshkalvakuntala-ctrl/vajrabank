@@ -46,22 +46,27 @@ body {
   margin-bottom: 30px;
 }
 
-/* BUTTONS */
-.btn-primary {
-  background: linear-gradient(135deg, #4da3ff, #1e90ff);
+
+
+.btn-primary{
+  background: #4da3ff;
+  border: none;
   padding: 14px 30px;
   border-radius: 30px;
-  border: none;
-  color: white;
+  color: #e6e9f1;
   cursor: pointer;
+  
+
 }
+
+
 
 .btn-outline {
   background: transparent;
   border: 1px solid #4da3ff;
   padding: 14px 30px;
   border-radius: 30px;
-  color: #4da3ff;
+  color: #f4f7fa;
   cursor: pointer;
 }
 

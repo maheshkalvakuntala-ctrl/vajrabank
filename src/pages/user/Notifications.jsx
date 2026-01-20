@@ -96,7 +96,7 @@ export default function Notifications() {
         {notifications.length === 0 ? (
           <div className="notifications-empty">
             <Bell size={48} />
-            <p>You’re all caught up 🎉</p>
+            <p>You're all caught up 🎉</p>
           </div>
         ) : (
           notifications.map((n) => (

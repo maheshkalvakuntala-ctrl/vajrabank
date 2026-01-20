@@ -1,5 +1,7 @@
 import { BrowserRouter, Routes, Route } from "react-router-dom";
 import { AuthProvider } from "./context/AuthContext";
+import { PartnerProvider } from "./context/PartnerContext";
+import { AdProvider } from "./context/AdContext";
 import "./styles/ThemeVariables.css";
 import "./styles/GlassTheme.css";
 
@@ -29,6 +31,7 @@ import AdminCards from "./pages/admin/Cards";
 import AdminLoans from "./pages/admin/Loans";
 import KYC from "./pages/admin/KYC";
 import Reports from "./pages/admin/Reports";
+import AdminAds from "./pages/admin/AdminAds";
 
 /* USER */
 import UserLayout from "./layouts/UserLayout";
@@ -51,75 +54,90 @@ import Transfers from "./pages/tools/Transfers";
 import Business from "./pages/tools/Business";
 import Global from "./pages/tools/Global";
 
+/* PARTNER */
+import Subscription from "./pages/partner/Subscription";
+import PartnerDashboard from "./pages/partner/PartnerDashboard";
+
 export default function App() {
   return (
     <AuthProvider>
-      <BrowserRouter>
-        <Routes>
-          {/* 🌍 PUBLIC ROUTES (LAYOUT BASED) */}
-          <Route element={<PublicLayout />}>
-            <Route path="/" element={<Home />} />
-            <Route path="/about" element={<About />} />
-            <Route path="/contact" element={<Contact />} />
-            <Route path="/login" element={<Login />} />
-            <Route path="/signup" element={<SignUp />} />
+      <PartnerProvider>
+        <AdProvider>
+          <BrowserRouter>
+            <Routes>
+              {/* 🌍 PUBLIC ROUTES (LAYOUT BASED) */}
+              <Route element={<PublicLayout />}>
+                <Route path="/" element={<Home />} />
+                <Route path="/about" element={<About />} />
+                <Route path="/contact" element={<Contact />} />
+                <Route path="/login" element={<Login />} />
+                <Route path="/signup" element={<SignUp />} />
 
-            {/* 🛠️ TOOLS & CALCULATORS */}
-            <Route path="/tools">
-              <Route path="loan-calculator" element={<LoanCalculatorPage />} />
-              <Route path="roi" element={<ROI />} />
-              <Route path="cards" element={<CardsTool />} />
-              <Route path="transfers" element={<Transfers />} />
-              <Route path="business" element={<Business />} />
-              <Route path="global" element={<Global />} />
-            </Route>
-          </Route>
+                {/* 🛠️ TOOLS & CALCULATORS */}
+                <Route path="/tools">
+                  <Route path="loan-calculator" element={<LoanCalculatorPage />} />
+                  <Route path="roi" element={<ROI />} />
+                  <Route path="cards" element={<CardsTool />} />
+                  <Route path="transfers" element={<Transfers />} />
+                  <Route path="business" element={<Business />} />
+                  <Route path="global" element={<Global />} />
+                </Route>
 
-          {/* 🔐 ADMIN LOGIN (No Layout) */}
-          <Route path="/admin" element={<AdminLogin />} />
+                {/* 👥 PARTNER MODULE */}
+                <Route path="/partner">
+                  <Route path="subscribe" element={<Subscription />} />
+                  <Route path="dashboard" element={<PartnerDashboard />} />
+                </Route>
+              </Route>
 
-          {/* 🔐 ADMIN ROUTES (LAYOUT + PROTECTED) */}
-          <Route
-            path="/admin"
-            element={
-              <ProtectedAdminRoute>
-                <AdminLayout />
-              </ProtectedAdminRoute>
-            }
-          >
-            <Route path="dashboard" element={<AdminDashboard />} />
-            <Route path="profile" element={<AdminProfile />} />
-            <Route path="customers" element={<Customers />} />
-            <Route path="accounts" element={<Accounts />} />
-            <Route path="cards" element={<AdminCards />} />
-            <Route path="loans" element={<AdminLoans />} />
-            <Route path="kyc" element={<KYC />} />
-            <Route path="reports" element={<Reports />} />
-          </Route>
+              {/* 🔐 ADMIN LOGIN (No Layout) */}
+              <Route path="/admin" element={<AdminLogin />} />
 
-          {/* 👤 USER ROUTES (LAYOUT BASED) */}
-          <Route path="/user" element={<UserLayout />}>
-            <Route index element={<UserDashboard />} />
-            <Route path="dashboard" element={<UserDashboard />} />
-            <Route path="profile" element={<Profile />} />
-            <Route path="transactions" element={<Transactions />} />
-            <Route path="loans" element={<Loans />} />
-            <Route path="cards" element={<Cards />} />
-            <Route path="feedback" element={<Feedback />} />
-            <Route path="payments" element={<Payments />} />
-            <Route path="rewards" element={<Rewards />} />
-            <Route path="international" element={<InternationalTransfer />} />
-            <Route path="notifications" element={<Notifications />} />
-          </Route>
+              {/* 🔐 ADMIN ROUTES (LAYOUT + PROTECTED) */}
+              <Route
+                path="/admin"
+                element={
+                  <ProtectedAdminRoute>
+                    <AdminLayout />
+                  </ProtectedAdminRoute>
+                }
+              >
+                <Route path="dashboard" element={<AdminDashboard />} />
+                <Route path="profile" element={<AdminProfile />} />
+                <Route path="customers" element={<Customers />} />
+                <Route path="accounts" element={<Accounts />} />
+                <Route path="cards" element={<AdminCards />} />
+                <Route path="loans" element={<AdminLoans />} />
+                <Route path="kyc" element={<KYC />} />
+                <Route path="reports" element={<Reports />} />
+                <Route path="ads" element={<AdminAds />} />
+              </Route>
 
-          {/* ❌ FALLBACK */}
-          <Route
-            path="*"
-            element={<h2 style={{ padding: 40 }}>Page Not Found</h2>}
-          />
+              {/* 👤 USER ROUTES (LAYOUT BASED) */}
+              <Route path="/user" element={<UserLayout />}>
+                <Route index element={<UserDashboard />} />
+                <Route path="dashboard" element={<UserDashboard />} />
+                <Route path="profile" element={<Profile />} />
+                <Route path="transactions" element={<Transactions />} />
+                <Route path="loans" element={<Loans />} />
+                <Route path="cards" element={<Cards />} />
+                <Route path="feedback" element={<Feedback />} />
+                <Route path="payments" element={<Payments />} />
+                <Route path="rewards" element={<Rewards />} />
+                <Route path="international" element={<InternationalTransfer />} />
+                <Route path="notifications" element={<Notifications />} />
+              </Route>
 
-        </Routes>
-      </BrowserRouter>
+              {/* ❌ FALLBACK */}
+              <Route
+                path="*"
+                element={<h2 style={{ padding: 40 }}>Page Not Found</h2>}
+              />
+
+            </Routes>
+          </BrowserRouter>
+        </AdProvider>
+      </PartnerProvider>
     </AuthProvider>
   );
 }
