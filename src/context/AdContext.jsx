@@ -29,9 +29,9 @@ export const AdProvider = ({ children }) => {
             setError(null);
 
             const activeAds = await adService.getActiveAds();
-            setAds(activeAds);
+            setAds(activeAds || []);
 
-            console.log('✅ Ads loaded from REST API:', activeAds.length);
+            console.log('✅ Ads loaded from REST API:', (activeAds || []).length);
         } catch (err) {
             console.error('❌ Failed to fetch ads:', err);
             setError(err.message);
@@ -62,11 +62,40 @@ export const AdProvider = ({ children }) => {
 
     /**
      * Get ads for a specific page
+     * 
+     * CRITICAL: Only returns APPROVED + isActive ads
+     * Supports both placements[] array (new) and showOn object (legacy)
      */
     const getAdsForPage = (pageName) => {
+        if (!pageName) return ads;
+
         return ads.filter(ad => {
-            if (!ad.showOn) return false;
-            return ad.showOn[pageName] === true;
+            // CRITICAL: Only show APPROVED ads
+            if (ad.status !== 'APPROVED') {
+                return false;
+            }
+
+            // If explicitly set to inactive, hide it
+            if (ad.isActive === false) return false;
+
+            // New Schema: placements array
+            if (ad.placements && Array.isArray(ad.placements)) {
+                return ad.placements.includes(pageName.toUpperCase());
+            }
+
+            // Legacy Schema: showOn object
+            if (ad.showOn && typeof ad.showOn === 'object') {
+                return ad.showOn[pageName.toLowerCase()] === true;
+            }
+
+            // Default: Show on Home, About, Contact if no placement info is present
+            // (Assuming all partner ads go to these 3 pages as per request "Only show ads on Home, About, Contact pages")
+            const allowedPages = ['home', 'about', 'contact'];
+            if (allowedPages.includes(pageName.toLowerCase())) {
+                return true;
+            }
+
+            return false;
         });
     };
 

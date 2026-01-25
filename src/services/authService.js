@@ -3,7 +3,7 @@
  * Handles login, logout, and token management
  */
 
-const API_URL = import.meta.env.VITE_API_URL || 'http://localhost:5000';
+const API_URL = import.meta.env.VITE_API_URL || 'http://127.0.0.1:5000';
 
 export const authService = {
     /**
@@ -32,7 +32,6 @@ export const authService = {
             if (data.token) {
                 localStorage.setItem('authToken', data.token);
                 localStorage.setItem('user', JSON.stringify(data.user));
-                console.log('✅ Login successful, token stored');
             }
 
             return data;
@@ -41,6 +40,8 @@ export const authService = {
             throw error;
         }
     },
+
+
 
     /**
      * Logout user and remove token

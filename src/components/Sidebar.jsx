@@ -28,6 +28,7 @@ export default function Sidebar({ isOpen, onClose }) {
           <li><NavLink to="loans" onClick={onClose}>Loans</NavLink></li>
           <li><NavLink to="kyc" onClick={onClose}>KYC</NavLink></li>
           <li><NavLink to="reports" onClick={onClose}>Reports</NavLink></li>
+          <li><NavLink to="ads" onClick={onClose}>Ads Management</NavLink></li>
         </ul>
       </div>
     </aside>

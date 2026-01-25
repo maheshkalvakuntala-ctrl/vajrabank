@@ -132,7 +132,6 @@ export default function Home() {
 
   return (
     <>
-      <AdBanner />
       {/* ================= HERO (UPDATED ONLY) ================= */}
       <section className="hero-glass">
         <div
@@ -163,7 +162,7 @@ export default function Home() {
               Create Account
             </button>
             <button className="btn-outline" onClick={scrollToFeatures}>
-             Explore Features
+              Explore Features
             </button>
           </div>
           <div className="trust-strip">

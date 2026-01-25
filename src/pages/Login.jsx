@@ -86,6 +86,23 @@ export default function Login() {
         const userDoc = await getDoc(doc(userDB, 'users', user.uid));
 
         if (!userDoc.exists()) {
+          // CHECK IF PARTNER
+          const partnerDoc = await getDoc(doc(userDB, 'partners', user.uid));
+
+          if (partnerDoc.exists()) {
+            const partnerData = partnerDoc.data();
+            await loginUser({
+              uid: user.uid,
+              email: user.email,
+              role: "partner",
+              source: "firebase",
+              displayName: partnerData.companyName || partnerData.fullName,
+              ...partnerData
+            });
+            navigate("/partner/dashboard");
+            return;
+          }
+
           setError("User profile not found. Please contact support.");
           setSubmitting(false);
           return;
@@ -332,7 +349,7 @@ export default function Login() {
                   {image ? (
                     <img src={image} alt="Profile" className="avatar-preview" />
                   ) : (
-                    <span>Upload</span>
+                    <span style={{color:"white"}}>Upload</span>
                   )}
                   <input
                     type="file"
@@ -419,6 +436,7 @@ export default function Login() {
         <p className="hint-a" onClick={() => navigate("/admin")}>
           Admin Login →
         </p>
+
       </div>
     </div>
   );

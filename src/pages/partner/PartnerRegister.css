@@ -1,0 +1,213 @@
+/* PartnerRegister.css */
+@import url('https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500;600;700&display=swap');
+
+.partner-register-page {
+    min-height: 100vh;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    background: radial-gradient(circle at top right, #1e293b 0%, #0b1220 100%);
+    font-family: 'Outfit', sans-serif;
+    padding: 40px;
+    position: relative;
+    overflow: hidden;
+}
+
+/* Background Abstract Shapes */
+.partner-register-page::before {
+    content: '';
+    position: absolute;
+    top: -100px;
+    right: -100px;
+    width: 400px;
+    height: 400px;
+    background: radial-gradient(circle, rgba(59, 130, 246, 0.15), transparent 70%);
+    border-radius: 50%;
+    z-index: 0;
+}
+
+.partner-register-page::after {
+    content: '';
+    position: absolute;
+    bottom: -50px;
+    left: -50px;
+    width: 300px;
+    height: 300px;
+    background: radial-gradient(circle, rgba(139, 92, 246, 0.15), transparent 70%);
+    border-radius: 50%;
+    z-index: 0;
+}
+
+.register-card {
+    max-width: 900px;
+    width: 100%;
+    background: rgba(15, 23, 42, 0.7);
+    backdrop-filter: blur(20px);
+    border: 1px solid rgba(255, 255, 255, 0.08);
+    border-radius: 24px;
+    padding: 0;
+    display: flex;
+    box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.5);
+    z-index: 1;
+    overflow: hidden;
+    animation: fadeInScale 0.6s cubic-bezier(0.16, 1, 0.3, 1);
+}
+
+.register-sidebar {
+    width: 35%;
+    background: linear-gradient(135deg, #0f172a 0%, #1e293b 100%);
+    padding: 40px;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    border-right: 1px solid rgba(255, 255, 255, 0.05);
+    position: relative;
+}
+
+.sidebar-content h3 {
+    font-size: 2rem;
+    font-weight: 700;
+    background: linear-gradient(to right, #60a5fa, #a78bfa);
+    -webkit-background-clip: text;
+    background-clip: text;
+    -webkit-text-fill-color: transparent;
+    margin-bottom: 16px;
+}
+
+.sidebar-content p {
+    color: #94a3b8;
+    line-height: 1.6;
+    margin-bottom: 32px;
+}
+
+.plan-summary {
+    background: rgba(255, 255, 255, 0.05);
+    padding: 24px;
+    border-radius: 16px;
+    border: 1px solid rgba(255, 255, 255, 0.1);
+}
+
+.plan-summary h4 {
+    color: #f8fafc;
+    font-size: 1.1rem;
+    margin-bottom: 12px;
+}
+
+.plan-badge {
+    display: inline-block;
+    background: #3b82f6;
+    color: white;
+    padding: 6px 14px;
+    border-radius: 20px;
+    font-size: 0.85rem;
+    font-weight: 600;
+    margin-bottom: 16px;
+}
+
+.plan-features-list {
+    list-style: none;
+    padding: 0;
+    margin: 0;
+}
+
+.plan-features-list li {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    color: #cbd5e1;
+    font-size: 0.9rem;
+    margin-bottom: 8px;
+}
+
+.register-main {
+    flex: 1;
+    padding: 40px 50px;
+}
+
+.register-header {
+    margin-bottom: 32px;
+}
+
+.register-header h2 {
+    font-size: 1.8rem;
+    color: #f8fafc;
+    margin-bottom: 8px;
+}
+
+.register-header p {
+    color: #64748b;
+}
+
+.form-grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 20px;
+}
+
+.form-group.full-width {
+    grid-column: span 2;
+}
+
+.glass-input {
+    background: rgba(255, 255, 255, 0.03);
+    border: 1px solid rgba(255, 255, 255, 0.1);
+    color: #f8fafc;
+    transition: all 0.3s ease;
+}
+
+.glass-input:focus {
+    background: rgba(255, 255, 255, 0.06);
+    border-color: #3b82f6;
+    box-shadow: 0 0 0 4px rgba(59, 130, 246, 0.1);
+}
+
+.glass-btn.primary {
+    background: linear-gradient(135deg, #3b82f6, #2563eb);
+    border: none;
+    font-size: 1rem;
+    letter-spacing: 0.5px;
+    box-shadow: 0 4px 15px rgba(37, 99, 235, 0.3);
+}
+
+.glass-btn.primary:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 8px 25px rgba(37, 99, 235, 0.4);
+}
+
+/* Responsive */
+@media (max-width: 900px) {
+    .register-card {
+        flex-direction: column;
+        max-width: 500px;
+    }
+
+    .register-sidebar {
+        width: 100%;
+        padding: 30px;
+        order: -1;
+    }
+
+    .register-main {
+        padding: 30px;
+    }
+
+    .form-grid {
+        grid-template-columns: 1fr;
+    }
+
+    .form-group.full-width {
+        grid-column: span 1;
+    }
+}
+
+@keyframes fadeInScale {
+    from {
+        opacity: 0;
+        transform: scale(0.95);
+    }
+
+    to {
+        opacity: 1;
+        transform: scale(1);
+    }
+}

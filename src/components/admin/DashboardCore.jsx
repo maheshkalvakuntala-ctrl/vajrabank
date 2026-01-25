@@ -2,15 +2,15 @@ import React from 'react';
 import DashboardStats from './DashboardStats';
 import AdminAnalytics from './AdminAnalytics';
 import AuditLogPanel from './AuditLogPanel';
-import AdModerationWidget from './AdModerationWidget';
+
 import { NavLink } from 'react-router-dom';
 import { ArrowRight, ExclamationTriangle, FileText, CreditCard, CheckCircle, XCircle } from 'react-bootstrap-icons';
 import "../../pages/admin/AdminDashboard.css";
 
 export default function DashboardCore({
-    role = 'ADMIN', // 'ADMIN' | 'PARTNER'
+    role = 'ADMIN', // 'ADMIN'
     data,
-    // Admin-specific props (optional for Partner)
+    // Admin-specific props
     pendingUsers = [],
     loadingUsers = false,
     approveUser,
@@ -98,6 +98,7 @@ export default function DashboardCore({
                                     <p className="alert-card-hint success">+4 Recent Requests</p>
                                 </div>
                             </div>
+
                         </div>
                     </section>
 

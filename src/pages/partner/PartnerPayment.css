@@ -1,0 +1,79 @@
+/* PartnerPayment.css */
+.partner-payment-page {
+    min-height: 100vh;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    background: radial-gradient(circle at top right, #1e293b 0%, #0b1220 100%);
+    padding: 20px;
+    font-family: 'Outfit', sans-serif;
+}
+
+.payment-card {
+    max-width: 500px;
+    width: 100%;
+    animation: fadeIn 0.5s ease-out;
+}
+
+.payment-header {
+    text-align: center;
+    margin: 24px 0;
+    padding: 20px;
+    background: rgba(59, 130, 246, 0.1);
+    border-radius: 12px;
+    border: 1px solid rgba(59, 130, 246, 0.2);
+}
+
+.payment-plan {
+    color: #60a5fa;
+    font-size: 1.2rem;
+    font-weight: 600;
+    margin-bottom: 8px;
+}
+
+.payment-amount {
+    font-size: 3rem;
+    font-weight: 700;
+    color: #f8fafc;
+}
+
+.payment-form {
+    margin-top: 24px;
+}
+
+.card-element-container {
+    padding: 16px;
+    background: rgba(255, 255, 255, 0.03);
+    border: 1px solid rgba(255, 255, 255, 0.1);
+    border-radius: 10px;
+    margin-bottom: 24px;
+    transition: all 0.2s;
+}
+
+.card-element-container:focus-within {
+    border-color: #3b82f6;
+    background: rgba(255, 255, 255, 0.05);
+}
+
+.test-mode-note {
+    text-align: center;
+    color: #94a3b8;
+    font-size: 0.85rem;
+    margin-top: 16px;
+}
+
+.w-100 {
+    width: 100%;
+}
+
+@keyframes fadeIn {
+    from {
+        opacity: 0;
+        transform: translateY(10px);
+    }
+
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}

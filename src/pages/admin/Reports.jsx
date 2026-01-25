@@ -64,7 +64,7 @@ export default function Reports() {
   if (loading) return <div>Loading...</div>;
 
   return (
-    <div style={{ padding: '24px', color: 'white', maxWidth: '1600px', margin: '0 auto' }}>
+    <div style={{ padding: '24px', color: 'black', maxWidth: '1600px', margin: '0 auto' }}>
       <h1>Analytics & Reports</h1>
       <p style={{ color: '#94a3b8' }}>Generate compliant reports for audit and risk analysis.</p>
 

@@ -1,104 +1,68 @@
 /**
- * Advertisement Service - REST API Based
+ * Advertisement Service - Firebase Firestore
  * 
- * Completely migrated from Firebase to Node.js + Express + MongoDB backend
- * All ad operations now use REST API endpoints instead of Firestore
+ * Replaces previous REST API implementation.
+ * Firebase is the single source of truth.
  */
-
-import { authService } from './authService.js';
-
-const API_URL = import.meta.env.VITE_API_URL || 'http://localhost:5000';
-
-/**
- * Helper: Get JWT token from localStorage via authService
- */
-const getAuthToken = () => {
-    return authService.getToken();
-};
-
-/**
- * Helper: Make authenticated API request
- */
-const apiRequest = async (endpoint, options = {}) => {
-    const token = getAuthToken();
-    const headers = {
-        'Content-Type': 'application/json',
-        ...options.headers
-    };
-
-    // Add auth token if available
-    if (token) {
-        headers['Authorization'] = `Bearer ${token}`;
-    }
-
-    try {
-        const response = await fetch(`${API_URL}${endpoint}`, {
-            ...options,
-            headers
-        });
-
-        const data = await response.json();
-
-        if (!response.ok) {
-            throw new Error(data.message || 'API request failed');
-        }
-
-        return data;
-    } catch (error) {
-        console.error(`API Error [${endpoint}]:`, error);
-        throw error;
-    }
-};
+import {
+    collection,
+    query,
+    where,
+    getDocs,
+    addDoc,
+    updateDoc,
+    doc,
+    serverTimestamp,
+    orderBy,
+    limit,
+    getDoc
+} from "firebase/firestore";
+import { userDB } from "../firebaseUser";
 
 export const adService = {
     /**
      * 1. GET ACTIVE ADS (Public)
-     * Fetches currently active advertisements from MongoDB backend
-     * 
-     * @param {string} page - Optional page filter (home, about, contact, user)
-     * @returns {Promise<Array>} Array of active ads
+     * Fetches currently active advertisements
      */
     getActiveAds: async (page = null) => {
         try {
-            const queryParam = page ? `?page=${page}` : '';
-            const result = await apiRequest(`/api/ads/active${queryParam}`);
+            const adsRef = collection(userDB, "ads");
+            // Simple query: Status APPROVED
+            // In a real app, you might check start/end dates too.
+            const q = query(adsRef, where("status", "==", "APPROVED"));
+            const querySnapshot = await getDocs(q);
 
-            return result.data || [];
+            return querySnapshot.docs.map(doc => ({
+                id: doc.id,
+                ...doc.data(),
+                // Normalize for frontend
+                redirectUrl: doc.data().redirectUrl || '#'
+            }));
         } catch (error) {
             console.error('Error fetching active ads:', error);
-            return []; // Return empty array on error to prevent UI crash
+            return [];
         }
     },
 
     /**
      * 2. CREATE AD (Partner)
-     * Creates a new advertisement (requires partner authentication)
-     * 
-     * @param {Object} adData - Advertisement data
-     * @returns {Promise<Object>} Created ad response
+     * Creates a new advertisement (PartnerDashboard calls this or uses direct Firestore)
+     * But since we have this service, we can use it.
      */
-    createAd: async (adData) => {
+    createAd: async (adData, partnerId, partnerName) => {
         try {
-            // Transform data to match backend schema
-            const payload = {
+            const docRef = await addDoc(collection(userDB, "ads"), {
+                partnerId: partnerId,
+                partnerName: partnerName,
                 title: adData.title,
+                description: adData.description || "",
                 imageUrl: adData.image,
-                redirectUrl: adData.url,
-                durationDays: parseInt(adData.duration),
-                showOn: {
-                    home: true,
-                    about: true,
-                    contact: true,
-                    user: true
-                }
-            };
-
-            const result = await apiRequest('/api/ads/create', {
-                method: 'POST',
-                body: JSON.stringify(payload)
+                redirectUrl: adData.url || "",
+                activeDays: parseInt(adData.duration),
+                status: "PENDING",
+                createdAt: serverTimestamp()
             });
-
-            return { success: true, id: result.data._id };
+            return { success: true, id: docRef.id };
         } catch (error) {
             console.error('Error creating ad:', error);
             throw error;
@@ -107,77 +71,76 @@ export const adService = {
 
     /**
      * 3. GET PARTNER ADS (Partner)
-     * Fetches all ads created by a specific partner
-     * 
-     * @param {string} partnerId - Partner ID
-     * @returns {Promise<Array>} Array of partner's ads
      */
     getPartnerAds: async (partnerId) => {
         try {
-            // Backend endpoint: GET /api/ads/partner/my-ads (partner only)
-            const result = await apiRequest('/api/ads/partner/my-ads');
-
-            return result.data?.map(ad => ({
-                id: ad._id,
-                title: ad.title,
-                image: ad.imageUrl,
-                url: ad.redirectUrl,
-                budget: 0, // Backend doesn't track budget (legacy field)
-                duration: ad.durationDays,
-                status: ad.status.toUpperCase(), // Convert 'approved' to 'ACTIVE'
-                createdAt: ad.createdAt
-            })) || [];
+            const q = query(
+                collection(userDB, "ads"),
+                where("partnerId", "==", partnerId),
+                orderBy("createdAt", "desc")
+            );
+            const querySnapshot = await getDocs(q);
+            return querySnapshot.docs.map(doc => ({
+                id: doc.id,
+                ...doc.data()
+            }));
         } catch (error) {
             console.error('Error fetching partner ads:', error);
-            return []; // Return empty array if unauthorized or error
+            // Index might be missing for complex queries
+            return [];
         }
     },
 
     /**
      * 4. GET PENDING ADS (Admin)
-     * Fetches advertisements awaiting approval
-     * 
-     * @returns {Promise<Array>} Array of pending ads
      */
     getPendingAds: async () => {
         try {
-            const result = await apiRequest('/api/ads/all?status=pending');
-
-            return result.data?.map(ad => ({
-                id: ad._id,
-                title: ad.title,
-                image: ad.imageUrl,
-                url: ad.redirectUrl,
-                duration: ad.durationDays,
-                status: 'PENDING',
-                createdAt: ad.createdAt,
-                partnerId: ad.createdBy,
-                businessName: ad.createdBy // TODO: Fetch actual business name from user
-            })) || [];
+            const q = query(
+                collection(userDB, "ads"),
+                where("status", "==", "PENDING")
+            );
+            const querySnapshot = await getDocs(q);
+            return querySnapshot.docs.map(doc => ({
+                id: doc.id,
+                ...doc.data(),
+                durationDays: doc.data().activeDays, // Map for compatibility
+                businessName: doc.data().partnerName, // Map for compatibility
+                paymentStatus: 'PAID' // Assumed since they are partners
+            }));
         } catch (error) {
             console.error('Error fetching pending ads:', error);
-            throw error;
+            return [];
         }
     },
 
     /**
      * 5. APPROVE AD (Admin)
-     * Approves an advertisement and activates it
-     * 
-     * @param {string} adId - Advertisement ID
-     * @param {number} durationDays - Duration in days (optional, already set)
-     * @param {string} partnerId - Partner ID (optional, for notifications)
-     * @param {string} adTitle - Ad title (optional, for notifications)
-     * @returns {Promise<Object>} Approval response
      */
-    approveAd: async (adId, durationDays, partnerId, adTitle) => {
+    approveAd: async (adId, durationDays) => {
         try {
-            const result = await apiRequest(`/api/ads/approve/${adId}`, {
-                method: 'PUT'
+            // Update Ad
+            await updateDoc(doc(userDB, "ads", adId), {
+                status: "APPROVED",
+                approvedAt: serverTimestamp(),
+                // Calculate expiry? Not strictly needed for this demo, usually handled by a scheduled function
             });
 
-            // TODO: Create notification via separate notification service
-            // For now, backend handles notification internally
+            // Get Ad to find partnerId
+            const adSnap = await getDoc(doc(userDB, "ads", adId));
+            const adData = adSnap.data();
+
+            // Notify Partner
+            if (adData && adData.partnerId) {
+                await addDoc(collection(userDB, "notifications"), {
+                    targetRole: "partner",
+                    targetUserId: adData.partnerId,
+                    type: "AD_APPROVED",
+                    message: `Your ad "${adData.title}" has been approved!`,
+                    isRead: false,
+                    createdAt: serverTimestamp()
+                });
+            }
 
             return { success: true };
         } catch (error) {
@@ -188,20 +151,40 @@ export const adService = {
 
     /**
      * 6. REJECT AD (Admin)
-     * Rejects an advertisement
-     * 
-     * @param {string} adId - Advertisement ID
-     * @param {string} reason - Rejection reason
-     * @param {string} partnerId - Partner ID (optional)
-     * @param {string} adTitle - Ad title (optional)
-     * @returns {Promise<Object>} Rejection response
      */
-    rejectAd: async (adId, reason = "No reason provided", partnerId, adTitle) => {
+    rejectAd: async (adOrId) => {
         try {
-            const result = await apiRequest(`/api/ads/reject/${adId}`, {
-                method: 'PUT',
-                body: JSON.stringify({ reason })
+            let id, reason;
+            if (typeof adOrId === 'object') {
+                id = adOrId.adId;
+                reason = adOrId.reason;
+            } else {
+                id = adOrId;
+                reason = "No reason provided";
+            }
+
+            // Update Ad
+            await updateDoc(doc(userDB, "ads", id), {
+                status: "REJECTED",
+                rejectionReason: reason,
+                rejectedAt: serverTimestamp()
             });
+
+            // Get Ad to find partnerId
+            const adSnap = await getDoc(doc(userDB, "ads", id));
+            const adData = adSnap.data();
+
+            // Notify Partner
+            if (adData && adData.partnerId) {
+                await addDoc(collection(userDB, "notifications"), {
+                    targetRole: "partner",
+                    targetUserId: adData.partnerId,
+                    type: "AD_REJECTED",
+                    message: `Your ad "${adData.title}" was rejected: ${reason}`,
+                    isRead: false,
+                    createdAt: serverTimestamp()
+                });
+            }
 
             return { success: true };
         } catch (error) {
@@ -211,26 +194,50 @@ export const adService = {
     },
 
     /**
-     * 7. TRACK CLICK (Public)
-     * Tracks advertisement click
-     * 
-     * Note: Backend doesn't currently have click tracking endpoint
-     * This is a placeholder for future implementation
-     * 
-     * @param {string} adId - Advertisement ID
-     * @param {number} costPerClick - Cost per click (not used in MongoDB version)
+     * 7. GET AD STATS (Admin)
      */
-    trackClick: async (adId, costPerClick = 0.50) => {
+    getAdStats: async () => {
         try {
-            // TODO: Backend needs to implement click tracking endpoint
-            // For now, just log the click
-            console.log(`Ad clicked: ${adId}`);
-            return { success: true };
+            // In Firestore, counting efficiently requires Aggregation Queries (v9+)
+            // For now, we'll just fetch all (assuming small volume for demo) or use status-specific queries
+            // A better way is to keep counters in a 'stats' document.
+            // Here, we will just do a rudimentary fetch of all ads for the stats.
+            const q = query(collection(userDB, "ads"));
+            const snapshot = await getDocs(q);
+
+            const stats = {
+                PENDING: 0,
+                APPROVED: 0,
+                REJECTED: 0
+            };
+
+            snapshot.forEach(doc => {
+                const s = doc.data().status;
+                if (stats[s] !== undefined) stats[s]++;
+            });
+
+            // Format used by AdminAds.jsx: { statusCounts: [{_id: 'PENDING', count: 5}, ...], activeCount: [] }
+            return {
+                statusCounts: [
+                    { _id: 'PENDING', count: stats.PENDING },
+                    { _id: 'APPROVED', count: stats.APPROVED },
+                    { _id: 'REJECTED', count: stats.REJECTED }
+                ]
+            };
         } catch (error) {
-            console.error('Error tracking click:', error);
+            console.error('Error fetching ad stats:', error);
+            return { statusCounts: [] };
         }
+    },
+
+    /**
+     * 8. TRACK CLICK
+     */
+    trackClick: async (adId) => {
+        console.log("Tracking click for", adId);
+        // Implement increment logic if needed
+        return { success: true };
     }
 };
 
 export default adService;
-export { apiRequest };

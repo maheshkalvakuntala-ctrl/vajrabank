@@ -1,145 +1,249 @@
-import React, { useState, useEffect } from 'react';
+import React, { useEffect, useState, useCallback } from 'react';
+import { motion } from 'framer-motion';
+import { useLocation } from 'react-router-dom';
+import {
+  CheckCircle,
+  XCircle,
+  ClockHistory,
+  Megaphone,
+  ShieldCheck
+} from 'react-bootstrap-icons';
 import { adService } from '../../services/adService';
-import { CheckCircle, XCircle, ClockHistory } from 'react-bootstrap-icons';
 
 export default function AdminAds() {
-    const [stats, setStats] = useState({ pending: 0, active: 0, rejected: 0 });
-    const [pendingAds, setPendingAds] = useState([]);
-    const [loading, setLoading] = useState(true);
+  const location = useLocation();
 
-    const fetchAds = async () => {
-        setLoading(true);
-        try {
-            // 1. Fetch Pending Ads
-            const pending = await adService.getPendingAds();
-            setPendingAds(pending);
+  const [loading, setLoading] = useState(true);
+  const [pendingAds, setPendingAds] = useState([]);
+  const [stats, setStats] = useState({
+    pending: 0,
+    active: 0,
+    rejected: 0,
+    total: 0
+  });
 
-            // 2. Fetch Real Stats
-            const statsData = await adService.getAdStats();
+  /* -------------------- FETCH ADS -------------------- */
+  const fetchAds = useCallback(async () => {
+    setLoading(true);
+    try {
+      const [pending, statsData] = await Promise.all([
+        adService.getPendingAds(),
+        adService.getAdStats()
+      ]);
 
-            // Parse stats from backend format
-            // Backend returns: { statusCounts: [{_id: 'approved', count: 5}], activeCount: [{count: 2}] }
-            const counts = statsData.statusCounts?.reduce((acc, curr) => {
-                acc[curr._id] = curr.count;
-                return acc;
-            }, {}) || {};
+      setPendingAds(pending || []);
 
-            setStats({
-                pending: counts.pending || 0,
-                active: statsData.activeCount?.[0]?.count || 0,
-                rejected: counts.rejected || 0,
-                total: (counts.pending || 0) + (counts.approved || 0) + (counts.rejected || 0)
-            });
+      const counts =
+        statsData?.statusCounts?.reduce((acc, cur) => {
+          acc[cur._id] = cur.count;
+          return acc;
+        }, {}) || {};
 
-        } catch (error) {
-            console.error("Failed to load ads", error);
-        } finally {
-            setLoading(false);
-        }
-    };
+      const pendingCount = counts.PENDING || counts.pending || 0;
+      const activeCount = counts.APPROVED || counts.approved || 0;
+      const rejectedCount = counts.REJECTED || counts.rejected || 0;
 
-    useEffect(() => {
-        fetchAds();
-    }, []);
+      setStats({
+        pending: pendingCount,
+        active: activeCount,
+        rejected: rejectedCount,
+        total: pendingCount + activeCount + rejectedCount
+      });
+    } catch (err) {
+      console.error('❌ Failed to fetch ads:', err);
+    } finally {
+      setLoading(false);
+    }
+  }, []);
 
-    // Scroll to specific ad if navigated from notification
-    useEffect(() => {
-        const state = window.history.state?.usr; // React Router state
-        if (state?.openAdId && !loading) {
-            const element = document.getElementById(`ad-${state.openAdId}`);
-            if (element) {
-                element.scrollIntoView({ behavior: 'smooth', block: 'center' });
-                element.style.border = '2px solid #3b82f6'; // Highlight
-                setTimeout(() => element.style.border = '1px solid #334155', 3000);
-            }
-        }
-    }, [loading, pendingAds]);
+  useEffect(() => {
+    fetchAds();
+  }, [fetchAds]);
 
-    const handleApprove = async (ad) => {
-        try {
-            await adService.approveAd(ad.id, ad.duration);
-            fetchAds();
-            alert(`Approved "${ad.title}" for ${ad.duration} days.`);
-        } catch (error) {
-            alert("Error approving ad");
-        }
-    };
+  /* -------------------- SCROLL FROM NOTIFICATION -------------------- */
+  const openAdId = location.state?.openAdId;
 
-    const handleReject = async (ad) => {
-        const reason = window.prompt("Enter rejection reason (optional):");
-        if (reason === null) return; // User cancelled
+  useEffect(() => {
+    if (!openAdId || loading) return;
 
-        try {
-            await adService.rejectAd(ad.id, reason || "No description", ad.partnerId, ad.title);
-            fetchAds();
-        } catch (error) {
-            alert("Error rejecting ad");
-        }
-    };
+    const timeout = setTimeout(() => {
+      const el = document.getElementById(`ad-${openAdId}`);
+      if (!el) return;
 
-    return (
-        <div style={{ color: 'white', padding: '40px' }}>
-            <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '40px' }}>
-                <div>
-                    <h1 style={{ fontSize: '2rem', fontWeight: 'bold' }}>Ad Moderation</h1>
-                    <p style={{ color: '#94a3b8' }}>Review and manage partner ad campaigns</p>
-                </div>
-                <div style={{ display: 'flex', gap: '20px' }}>
-                    <div className="stat-pill" style={{ background: '#f59e0b22', color: '#f59e0b', padding: '8px 16px', borderRadius: '20px' }}>
-                        Pending: {stats.pending}
-                    </div>
-                </div>
-            </div>
+      el.scrollIntoView({ behavior: 'smooth', block: 'center' });
+      el.classList.add('highlight-premium');
 
-            {loading ? (
-                <div>Loading ads...</div>
-            ) : pendingAds.length === 0 ? (
-                <div style={{ textAlign: 'center', padding: '60px', background: '#ffffff05', borderRadius: '16px' }}>
-                    <ClockHistory size={40} style={{ marginBottom: '16px', color: '#94a3b8' }} />
-                    <h3>No Pending Ads</h3>
-                    <p style={{ color: '#64748b' }}>All caught up! Check back later.</p>
-                </div>
-            ) : (
-                <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fill, minmax(350px, 1fr))', gap: '24px' }}>
-                    {pendingAds.map(ad => (
-                        <div key={ad.id} id={`ad-${ad.id}`} style={{ background: '#1e293b', borderRadius: '16px', overflow: 'hidden', border: '1px solid #334155', display: 'flex', flexDirection: 'column', transition: 'border 0.3s' }}>
-                            {/* Ad Preview Image */}
-                            <div style={{ height: '180px', background: ad.image ? `url(${ad.image}) center/cover` : '#334155', position: 'relative' }}>
-                                <span style={{ position: 'absolute', top: 12, right: 12, background: 'rgba(0,0,0,0.6)', padding: '4px 8px', borderRadius: '4px', fontSize: '12px' }}>
-                                    Partner: {ad.businessName}
-                                </span>
-                            </div>
+      el.style.boxShadow = '0 0 25px rgba(59,130,246,0.6)';
+      el.style.borderColor = '#3b82f6';
 
-                            <div style={{ padding: '20px', flex: 1 }}>
-                                <h3 style={{ marginTop: 0 }}>{ad.title}</h3>
-                                <p style={{ color: '#94a3b8', fontSize: '14px', marginBottom: '16px' }}>
-                                    <a href={ad.url} target="_blank" rel="noreferrer" style={{ color: '#3b82f6' }}>{ad.url}</a>
-                                </p>
+      setTimeout(() => {
+        el.style.boxShadow = '';
+        el.style.borderColor = '';
+      }, 4000);
+    }, 400);
 
-                                <div style={{ display: 'flex', gap: '16px', marginBottom: '20px', fontSize: '14px', color: '#cbd5e1' }}>
-                                    <div>💰 Budget: <b>${ad.budget}</b></div>
-                                    <div>⏳ Duration: <b>{ad.duration} Days</b></div>
-                                </div>
+    return () => clearTimeout(timeout);
+  }, [openAdId, loading]);
 
-                                <div style={{ display: 'flex', gap: '12px', marginTop: 'auto' }}>
-                                    <button
-                                        onClick={() => handleApprove(ad)}
-                                        style={{ flex: 1, padding: '10px', borderRadius: '8px', border: 'none', background: '#10b981', color: 'white', fontWeight: 'bold', cursor: 'pointer', display: 'flex', alignItems: 'center', justifyContent: 'center', gap: '8px' }}
-                                    >
-                                        <CheckCircle /> Approve
-                                    </button>
-                                    <button
-                                        onClick={() => handleReject(ad)}
-                                        style={{ flex: 1, padding: '10px', borderRadius: '8px', border: 'none', background: '#ef4444', color: 'white', fontWeight: 'bold', cursor: 'pointer', display: 'flex', alignItems: 'center', justifyContent: 'center', gap: '8px' }}
-                                    >
-                                        <XCircle /> Reject
-                                    </button>
-                                </div>
-                            </div>
-                        </div>
-                    ))}
-                </div>
-            )}
+  /* -------------------- ACTIONS -------------------- */
+  const handleApprove = async (ad) => {
+    const adId = ad._id || ad.id;
+    try {
+      await adService.approveAd(adId, ad.durationDays);
+      await fetchAds();
+      window.dispatchEvent(new Event('notifications-updated'));
+    } catch {
+      alert('Failed to approve ad');
+    }
+  };
+
+  const handleReject = async (ad) => {
+    const adId = ad._id || ad.id;
+    const reason = window.prompt('Enter rejection reason (optional):');
+    if (reason === null) return;
+
+    try {
+      await adService.rejectAd({
+        adId,
+        reason: reason || 'No reason provided',
+        partnerId: ad.partnerId,
+        title: ad.title
+      });
+      await fetchAds();
+      window.dispatchEvent(new Event('notifications-updated'));
+    } catch {
+      alert('Failed to reject ad');
+    }
+  };
+
+  /* -------------------- UI -------------------- */
+  return (
+    <div style={{ padding: 40, color: '#fff', fontFamily: "'Outfit', sans-serif" }}>
+      {/* HEADER */}
+      <div className="d-flex justify-content-between align-items-center mb-5">
+        <div>
+          <h1
+            className="fw-bold"
+            style={{
+              fontSize: '2.5rem',
+              color:'black'
+            }}
+          >
+            Ad Command Center
+          </h1>
+          <p className="text-muted">
+            Review, approve, or reject partner campaigns
+          </p>
         </div>
-    );
+
+        <div className="glass-card px-4 py-2 d-flex gap-3 align-items-center border-warning bg-warning bg-opacity-10">
+          <ClockHistory size={22} className="text-warning" />
+          <div>
+            <div className="small text-muted fw-bold">Pending Ads</div>
+            <div className="h4 fw-bold mb-0 text-black">{stats.pending}</div>
+          </div>
+        </div>
+      </div>
+
+      {/* LOADING */}
+      {loading && (
+        <div className="text-center py-5">
+          <div className="spinner-border text-primary mb-3" />
+          <p className="text-muted">Loading ads...</p>
+        </div>
+      )}
+
+      {/* EMPTY */}
+      {!loading && pendingAds.length === 0 && (
+        <motion.div
+          initial={{ opacity: 0, y: 15 }}
+          animate={{ opacity: 1, y: 0 }}
+          className="glass-card text-center py-5"
+        >
+          <CheckCircle size={60} className="text-success mb-3 opacity-50" />
+          <h3 className="fw-bold">No Pending Ads</h3>
+          <p className="text-muted">You are all caught up 🎉</p>
+        </motion.div>
+      )}
+
+      {/* ADS GRID */}
+      <div className="row g-4">
+        {pendingAds.map((ad) => {
+          const adId = ad._id || ad.id;
+
+          return (
+            <motion.div
+              key={adId}
+              id={`ad-${adId}`}
+              initial={{ opacity: 0, scale: 0.95 }}
+              animate={{ opacity: 1, scale: 1 }}
+              className="col-xl-4 col-lg-6"
+            >
+              <div className="glass-card h-100 overflow-hidden border-secondary shadow-lg">
+                {/* IMAGE */}
+                <div style={{ height: 220, background: '#000' }}>
+                  <img
+                    src={ad.imageUrl}
+                    alt={ad.title}
+                    className="w-100 h-100 object-fit-cover opacity-75"
+                    onError={(e) => {
+                      e.target.src =
+                        'https://via.placeholder.com/800x400?text=Invalid+Image';
+                      e.target.className =
+                        'w-100 h-100 object-fit-contain p-4 opacity-50';
+                    }}
+                  />
+                </div>
+
+                {/* BODY */}
+                <div className="p-4">
+                  <div className="d-flex justify-content-between mb-2">
+                    <h4 className="fw-bold text-truncate">{ad.title}</h4>
+                    <span className="badge bg-secondary bg-opacity-25">
+                      {ad.durationDays} Days
+                    </span>
+                  </div>
+
+                  <div className="small text-muted mb-3">{ad.businessName}</div>
+
+                  <div className="d-flex gap-2 mb-4">
+                    <div className="flex-grow-1">
+                      Payment:{' '}
+                      <span
+                        className={
+                          ad.paymentStatus === 'PAID'
+                            ? 'text-success fw-bold'
+                            : 'text-danger fw-bold'
+                        }
+                      >
+                        {ad.paymentStatus || 'UNPAID'}
+                      </span>
+                    </div>
+                    {ad.paymentStatus === 'PAID' && (
+                      <ShieldCheck className="text-success" />
+                    )}
+                  </div>
+
+                  <div className="d-flex gap-2">
+                    <button
+                      className="btn btn-success flex-grow-1 fw-bold"
+                      onClick={() => handleApprove(ad)}
+                    >
+                      <CheckCircle /> Approve
+                    </button>
+                    <button
+                      className="btn btn-danger flex-grow-1 fw-bold"
+                      onClick={() => handleReject(ad)}
+                    >
+                      <XCircle /> Reject
+                    </button>
+                  </div>
+                </div>
+              </div>
+            </motion.div>
+          );
+        })}
+      </div>
+    </div>
+  );
 }

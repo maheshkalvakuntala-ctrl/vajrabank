@@ -1,0 +1,198 @@
+/* PartnerSubscribe.css */
+
+.partner-subscribe-page {
+    min-height: 100vh;
+    background-color: #0b1120;
+    /* Deep navy background */
+    background-image: radial-gradient(circle at 50% 0%, #1e293b 0%, #0b1120 70%);
+    font-family: 'Inter', system-ui, -apple-system, sans-serif;
+    color: #fff;
+    padding: 4rem 2rem;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+}
+
+.subscribe-header {
+    text-align: center;
+    margin-bottom: 4rem;
+}
+
+.subscribe-title {
+    font-size: 2.5rem;
+    font-weight: 700;
+    margin-bottom: 1rem;
+    background: linear-gradient(90deg, #60a5fa, #a855f7);
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+}
+
+.subscribe-subtitle {
+    color: #94a3b8;
+    max-width: 600px;
+    margin: 0 auto;
+    line-height: 1.6;
+}
+
+.plans-container {
+    display: flex;
+    gap: 2rem;
+    justify-content: center;
+    align-items: stretch;
+    flex-wrap: wrap;
+    max-width: 1200px;
+    width: 100%;
+}
+
+.plan-card {
+    background: #1e293b;
+    border: 1px solid #334155;
+    border-radius: 1rem;
+    padding: 2.5rem 2rem;
+    width: 320px;
+    display: flex;
+    flex-direction: column;
+    position: relative;
+    transition: transform 0.3s ease, box-shadow 0.3s ease;
+}
+
+.plan-card:hover {
+    transform: translateY(-5px);
+    box-shadow: 0 20px 25px -5px rgba(0, 0, 0, 0.1), 0 10px 10px -5px rgba(0, 0, 0, 0.04);
+}
+
+/* Most Popular Card Styling */
+.plan-card.popular {
+    border: 2px solid #3b82f6;
+    background: #1e293b;
+    /* Keep same base, border does the work */
+    box-shadow: 0 0 20px rgba(59, 130, 246, 0.15);
+    transform: scale(1.05);
+    z-index: 10;
+}
+
+.plan-card.popular:hover {
+    transform: scale(1.05) translateY(-5px);
+}
+
+.badge-popular {
+    position: absolute;
+    top: -14px;
+    left: 50%;
+    transform: translateX(-50%);
+    background-color: #3b82f6;
+    color: white;
+    padding: 0.35rem 1rem;
+    border-radius: 9999px;
+    font-size: 0.75rem;
+    font-weight: 600;
+    letter-spacing: 0.05em;
+    text-transform: uppercase;
+}
+
+.plan-name {
+    text-align: center;
+    font-size: 1.25rem;
+    font-weight: 600;
+    color: #fff;
+    margin-bottom: 1.5rem;
+}
+
+.plan-price {
+    text-align: center;
+    font-size: 3rem;
+    font-weight: 800;
+    color: #fff;
+    margin-bottom: 2rem;
+    display: flex;
+    justify-content: center;
+    align-items: baseline;
+}
+
+.plan-price span {
+    font-size: 1rem;
+    color: #94a3b8;
+    font-weight: normal;
+    margin-left: 0.25rem;
+}
+
+.features-list {
+    list-style: none;
+    padding: 0;
+    margin: 0 0 2rem 0;
+    flex-grow: 1;
+}
+
+.feature-item {
+    display: flex;
+    align-items: center;
+    margin-bottom: 1rem;
+    color: #cbd5e1;
+    font-size: 0.95rem;
+}
+
+.check-icon {
+    background-color: rgba(16, 185, 129, 0.2);
+    color: #10b981;
+    width: 20px;
+    height: 20px;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    margin-right: 0.75rem;
+    font-size: 0.75rem;
+}
+
+.subscribe-btn {
+    width: 100%;
+    padding: 0.875rem;
+    border-radius: 0.5rem;
+    font-weight: 600;
+    cursor: pointer;
+    transition: all 0.2s;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 0.5rem;
+    font-size: 1rem;
+}
+
+/* Default / Secondary Button */
+.btn-secondary-plan {
+    background-color: #334155;
+    color: #fff;
+    border: 1px solid transparent;
+}
+
+.btn-secondary-plan:hover {
+    background-color: #475569;
+}
+
+/* Popular / Primary Button */
+.btn-primary-plan {
+    background-color: #3b82f6;
+    color: #fff;
+    border: none;
+}
+
+.btn-primary-plan:hover {
+    background-color: #2563eb;
+}
+
+.demo-mode-indicator {
+    margin-top: 4rem;
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+    color: #64748b;
+    font-size: 0.875rem;
+}
+
+.status-dot {
+    width: 8px;
+    height: 8px;
+    background-color: #10b981;
+    border-radius: 50%;
+    box-shadow: 0 0 5px #10b981;
+}

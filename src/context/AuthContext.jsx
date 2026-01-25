@@ -1,6 +1,7 @@
 import { createContext, useContext, useEffect, useState } from "react";
 import { onAuthStateChanged, signOut } from "firebase/auth";
 import { doc, getDoc, onSnapshot } from "firebase/firestore";
+// User Domain
 import { userAuth, userDB } from "../firebaseUser";
 
 const AuthContext = createContext(null);
@@ -11,25 +12,25 @@ export const AuthProvider = ({ children }) => {
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
-    // Check for Legacy User session first (synchronous check)
+    // 1. Static Checks first
     const savedLegacy = localStorage.getItem("legacyUser");
     if (savedLegacy) {
       setUser(JSON.parse(savedLegacy));
       setLoading(false);
+      return;
     }
 
-    // Listen for Firebase auth state changes
-    const unsubscribe = onAuthStateChanged(userAuth, async (firebaseUser) => {
-      try {
-        // Load admin from localStorage
-        const savedAdmin = localStorage.getItem("adminUser");
-        if (savedAdmin) {
-          setAdmin(JSON.parse(savedAdmin));
-        }
+    const savedAdmin = localStorage.getItem("adminUser");
+    if (savedAdmin) {
+      setAdmin(JSON.parse(savedAdmin));
+    }
 
+    // --- LISTENER A: User Domain (vajra-bank) ---
+    const unsubscribeUser = onAuthStateChanged(userAuth, async (firebaseUser) => {
+      try {
         if (firebaseUser) {
-          // Firebase User detected
           const userDoc = await getDoc(doc(userDB, 'users', firebaseUser.uid));
+
           if (userDoc.exists()) {
             const userData = userDoc.data();
             setUser({
@@ -40,37 +41,58 @@ export const AuthProvider = ({ children }) => {
               displayName: `${userData.firstName} ${userData.lastName}`,
               ...userData
             });
-
-            // 🔄 Real-time Overrides Listener
+            // Overrides listener for User
             onSnapshot(doc(userDB, 'overrides', firebaseUser.uid), (snapshot) => {
+              if (snapshot.exists()) setUser(prev => ({ ...prev, ...snapshot.data() }));
+            });
+            return;
+          }
+
+          // Check Partners Collection
+          const partnerDoc = await getDoc(doc(userDB, 'partners', firebaseUser.uid));
+          if (partnerDoc.exists()) {
+            const partnerData = partnerDoc.data();
+            setUser({
+              uid: firebaseUser.uid,
+              email: firebaseUser.email,
+              role: "partner",
+              source: "firebase",
+              displayName: partnerData.companyName || partnerData.fullName,
+              ...partnerData
+            });
+            // Real-time listener for Partner status changes (e.g. payment)
+            onSnapshot(doc(userDB, 'partners', firebaseUser.uid), (snapshot) => {
               if (snapshot.exists()) {
-                setUser(prev => ({ ...prev, ...snapshot.data() }));
+                const freshData = snapshot.data();
+                setUser(prev => ({ ...prev, ...freshData }));
               }
             });
-
-            // Clear legacy if Firebase takes over
-            localStorage.removeItem("legacyUser");
           } else {
+            // If document missing in both, strictly sign out
             await signOut(userAuth);
+          }
+        } else {
+          // User logged out
+          if (!savedLegacy) {
             setUser(null);
           }
-        } else if (!savedLegacy) {
-          // Only clear if no legacy user is active
-          setUser(null);
         }
-      } catch (err) {
-        console.error("Auth error:", err);
+      } catch (e) {
+        console.error("User Auth Error", e);
       } finally {
         setLoading(false);
       }
     });
 
-    return () => unsubscribe();
+    return () => {
+      unsubscribeUser();
+    };
   }, []);
 
   const loginAdmin = (email, password) => {
     if (email === "admin@vajra.com" && password === "Admin123") {
       const adminData = {
+        id: 'admin_1', // Match the seeded admin ID
         name: "Mahesh Kalvakuntla",
         email,
         role: "admin",
@@ -78,6 +100,8 @@ export const AuthProvider = ({ children }) => {
       };
       setAdmin(adminData);
       localStorage.setItem("adminUser", JSON.stringify(adminData));
+      // Set a dummy but valid token for test mode
+      localStorage.setItem("authToken", "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6ImFkbWluXzEiLCJyb2xlIjoiYWRtaW4iLCJlbWFpbCI6ImFkbWluQHZhanJhLmNvbSJ9.dummy_signature");
       return true;
     }
     return false;
@@ -99,13 +123,14 @@ export const AuthProvider = ({ children }) => {
 
   const logoutUser = async () => {
     try {
-      await signOut(userAuth);
+      // Try signing out both just in case
+      await signOut(userAuth).catch(() => { });
+
       setUser(null);
       localStorage.removeItem("legacyUser");
     } catch (error) {
       console.error("Logout error:", error);
       setUser(null);
-      localStorage.removeItem("legacyUser");
     }
   };
 
@@ -126,8 +151,6 @@ export const AuthProvider = ({ children }) => {
       {children}
     </AuthContext.Provider>
   );
-
-
 };
 
 export const useAuth = () => useContext(AuthContext);

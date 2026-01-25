@@ -253,7 +253,6 @@ export default function About() {
 
   return (
     <div className="about-v2">
-      <AdBanner />
       {/* 1️⃣ HERO CAROUSEL */}
       <section className="about-hero-viewport">
         <div
