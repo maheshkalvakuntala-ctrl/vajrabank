@@ -10,7 +10,7 @@ import "../../styles/GlassTheme.css";
 import "./PartnerPayment.css";
 
 // Load Stripe
-const stripePromise = loadStripe(import.meta.env.VITE_STRIPE_PUBLIC_KEY);
+const stripePromise = import.meta.env.VITE_STRIPE_PUBLIC_KEY ? loadStripe(import.meta.env.VITE_STRIPE_PUBLIC_KEY) : null;
 
 const CheckoutForm = () => {
     const stripe = useStripe();
